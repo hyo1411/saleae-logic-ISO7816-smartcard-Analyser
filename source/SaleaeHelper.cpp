@@ -8,6 +8,7 @@
 //
 
 #include "SaleaeHelper.hpp"
+#include "Convert.hpp"
 
 U64 SaleaeHelper::AdvanceClkCycles(AnalyzerChannelData* channel, U64 cycles)
 {
@@ -18,4 +19,21 @@ U64 SaleaeHelper::AdvanceClkCycles(AnalyzerChannelData* channel, U64 cycles)
 		channel->AdvanceToNextEdge();
 	}
 	return channel->GetSampleNumber();
+}
+
+
+bool SaleaeHelper::CanAdvanceToAbsPosition(AnalyzerChannelData* channel, U64 position)
+{
+	U64 _current = channel->GetSampleNumber();
+	return position > _current;
+}
+
+U32 SaleaeHelper::AdvanceToAbsPositionOrThrow(AnalyzerChannelData* channel, U64 position, std::string& name)
+{
+	if (!CanAdvanceToAbsPosition(channel, position))
+	{
+		std::string msg = std::string("Cannot advance channel '") + name + std::string("' to absolute position: ") + Convert::ToDec(position);
+		throw std::exception(msg.c_str());
+	}
+	return channel->AdvanceToAbsPosition(position);
 }

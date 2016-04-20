@@ -18,10 +18,12 @@ class SaleaeHelper
 {
 public:
 	static U64 AdvanceClkCycles(AnalyzerChannelData* channel, U64 cycles);
+	static bool CanAdvanceToAbsPosition(AnalyzerChannelData* channel, U64 position);
+	static U32 AdvanceToAbsPositionOrThrow(AnalyzerChannelData* channel, U64 position, std::string& name);
 
 private:
-	SaleaeHelper();
-	virtual ~SaleaeHelper();
+	SaleaeHelper() {}
+	virtual ~SaleaeHelper() {}
 };
 
 #endif //SALEAEHELPER_HPP

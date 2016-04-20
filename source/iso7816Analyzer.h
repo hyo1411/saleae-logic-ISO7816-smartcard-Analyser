@@ -55,10 +55,10 @@ public:
 
 protected:
 	virtual void _WorkerThread();
+
 	bool IsValidETU(U64 ea);
 	ISO7816Pps::ptr SeekPPS(U64 startPos, U64 endPos, U16 data, size_t& exchLen);
-
-	int CountClockPulses(U64 from, U64 to);
+	
 
 
 protected: //vars

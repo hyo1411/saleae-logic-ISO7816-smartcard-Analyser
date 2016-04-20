@@ -51,6 +51,9 @@
     <ClInclude Include="../source/SaleaeHelper.hpp">
       <Filter>Util</Filter>
     </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="../source/iso7816Analyzer.cpp">
@@ -77,5 +80,10 @@
     <ClCompile Include="../source/ISO7816Pps.cpp">
       <Filter>Util</Filter>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Resource.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
   </ItemGroup>
 </Project>

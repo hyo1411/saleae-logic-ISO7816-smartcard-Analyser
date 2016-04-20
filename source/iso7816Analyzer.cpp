@@ -102,18 +102,23 @@ void iso7816Analyzer::_WorkerThread()
 	mVcc = GetAnalyzerChannelData(mSettings->mVccChannel);
 	mClk = GetAnalyzerChannelData(mSettings->mClkChannel);
 
-	for( ; ; ) {
+	for( ; ; )
+	{
 		// seek for a RESET going high.
 		//
+		Logging::Write(std::string("Looking for RST going high..."));
 		mReset->AdvanceToNextEdge();
 
-		if (mReset->GetBitState() != BIT_HIGH )
+		if (mReset->GetBitState() != BIT_HIGH)
+		{
+			Logging::Write(std::string("Not this time..."));
 			continue;
+		}
 
 		// discard all serial data until now.
 		U64 reset = mReset->GetSampleNumber();
 		Logging::Write(std::string("Reset detected: ") + Convert::ToDec(reset));
-		mIo->AdvanceToAbsPosition(reset);		
+		SaleaeHelper::AdvanceToAbsPositionOrThrow(mIo, reset, std::string("I/O"));
 
 		// mark the start in pretty much all channels.
 		//
@@ -136,10 +141,11 @@ void iso7816Analyzer::_WorkerThread()
 		U64 a0 = 0;
 		while (true)
 		{
-			mClk->AdvanceToAbsPosition(mIo->GetSampleNumber());
+			SaleaeHelper::AdvanceToAbsPositionOrThrow(mClk, mIo->GetSampleNumber(), std::string("CLK"));
 			U64 startBit = SaleaeHelper::AdvanceClkCycles(mClk, 400);
 			Logging::Write(std::string("Start bit seeking: ") + Convert::ToDec(startBit));
-			mIo->AdvanceToAbsPosition(startBit);
+			SaleaeHelper::AdvanceToAbsPositionOrThrow(mIo, startBit, std::string("I/O"));
+			SaleaeHelper::AdvanceToAbsPositionOrThrow(mReset, startBit, std::string("RST"));
 			mResults->AddMarker(reset, AnalyzerResults::UpArrow, mSettings->mResetChannel);
 
 			// seeking for falling edge
@@ -153,8 +159,9 @@ void iso7816Analyzer::_WorkerThread()
 			mIo->AdvanceToNextEdge();
 			U64 a1 = mIo->GetSampleNumber();
 
-			mClk->AdvanceToAbsPosition(a0);
-			U64 clocks = mClk->AdvanceToAbsPosition(a1) / 2;
+			SaleaeHelper::AdvanceToAbsPositionOrThrow(mClk, a0, std::string("CLK"));
+			U64 clocks = SaleaeHelper::AdvanceToAbsPositionOrThrow(mClk, a1, std::string("CLK")) / 2;
+			SaleaeHelper::AdvanceToAbsPositionOrThrow(mReset, a1, std::string("RST"));
 
 			// default ETU shoud be 372 
 			if (!IsValidETU(clocks))
@@ -192,9 +199,11 @@ void iso7816Analyzer::_WorkerThread()
 		// move to the center of first data bit
 		U64 bitPos = SaleaeHelper::AdvanceClkCycles(mClk, etu / 2);
 		U64 pausePos = 0;
-		for (U32 i = 0; i <= 8; i++) {
+		for (U32 i = 0; i <= 8; i++)
+		{
 			// move to the center of what we're guessing as best as we can
-			mIo->AdvanceToAbsPosition(bitPos);
+			SaleaeHelper::AdvanceToAbsPositionOrThrow(mIo, bitPos, std::string("I/O"));
+			SaleaeHelper::AdvanceToAbsPositionOrThrow(mReset, bitPos, std::string("RST"));
 			U8 bit = mIo->GetBitState() ? 1 : 0;
 			mResults->AddMarker(mIo->GetSampleNumber(), bit ? AnalyzerResults::One : AnalyzerResults::Zero, mSettings->mIoChannel);
 			data = (data <<1) | bit;
@@ -206,7 +215,7 @@ void iso7816Analyzer::_WorkerThread()
 			{
 				bitPos = SaleaeHelper::AdvanceClkCycles(mClk, etu);
 			}
-		};
+		}
 		bool p = 1 == (data & 1);
 		data >>= 1;
 
@@ -281,8 +290,18 @@ void iso7816Analyzer::_WorkerThread()
 
 		// now we keep waiting for the next 'down'; start bit
 		// and then read our 10 bits, etc, etc.
-		for(;;) {
+		for(;;)
+		{
+			U64 _nextIo = mIo->GetSampleOfNextEdge();	//without moving, get the sample of the next transition.
+			if (mReset->WouldAdvancingToAbsPositionCauseTransition(_nextIo))
+			{
+				Logging::Write(std::string("A new possible reset detected..."));
+				break;
+			}
+
 			mIo->AdvanceToNextEdge(); //falling edge -- beginning of the start bit
+			U64 _current = mIo->GetSampleNumber();
+
 			if (mIo->GetBitState() != BIT_LOW) {
 				mResults->AddMarker(mIo->GetSampleNumber(),
 					AnalyzerResults::ErrorDot, mSettings->mIoChannel);
@@ -293,17 +312,19 @@ void iso7816Analyzer::_WorkerThread()
 
 			U64 starting_sample = mIo->GetSampleNumber();
 			// synchronise CLK position
-			mClk->AdvanceToAbsPosition(starting_sample);
+			SaleaeHelper::AdvanceToAbsPositionOrThrow(mClk, starting_sample, std::string("CLK"));
 
 			U64 bitPos = SaleaeHelper::AdvanceClkCycles(mClk, etu / 2);
-			mIo->AdvanceToAbsPosition(bitPos);
+			SaleaeHelper::AdvanceToAbsPositionOrThrow(mIo, bitPos, std::string("I/O"));
+			SaleaeHelper::AdvanceToAbsPositionOrThrow(mReset, bitPos, std::string("RST"));
 			mResults->AddMarker(mIo->GetSampleNumber(), AnalyzerResults::Start, mSettings->mIoChannel);
 
-			U16 data = 0; 
+			U16 data = 0;
 			for(U32 i = 0; i <= 8; i++) {
 
 				bitPos = SaleaeHelper::AdvanceClkCycles(mClk, etu);
-				mIo->AdvanceToAbsPosition(bitPos);
+				SaleaeHelper::AdvanceToAbsPositionOrThrow(mIo, bitPos, std::string("I/O"));
+				SaleaeHelper::AdvanceToAbsPositionOrThrow(mReset, bitPos, std::string("RST"));
 
 				U8 bit = mIo->GetBitState() ? 1 : 0;
 				mResults->AddMarker(mIo->GetSampleNumber(), bit ? AnalyzerResults::One : AnalyzerResults::Zero, mSettings->mIoChannel);
@@ -322,7 +343,8 @@ void iso7816Analyzer::_WorkerThread()
 			};
 
 			bitPos = SaleaeHelper::AdvanceClkCycles(mClk, etu);
-			mIo->AdvanceToAbsPosition(bitPos);
+			SaleaeHelper::AdvanceToAbsPositionOrThrow(mIo, bitPos, std::string("I/O"));
+			SaleaeHelper::AdvanceToAbsPositionOrThrow(mReset, bitPos, std::string("RST"));
 			if (mIo->GetBitState() != BIT_HIGH) {
 				Logging::Write(std::string("Stop bit not high."));
 				mResults->AddMarker(mIo->GetSampleNumber(), AnalyzerResults::ErrorDot, mSettings->mIoChannel);
@@ -393,16 +415,6 @@ ISO7816Pps::ptr iso7816Analyzer::SeekPPS(U64 startPos, U64 endPos, U16 data, siz
 	{
 		pps.erase(pps.begin());
 	}
-
-	//std::string tmp;
-	//for (std::vector<unsigned char>::iterator iter = pps.begin(); iter != pps.end(); iter++)
-	//{
-	//	tmp += Convert::ToHex((unsigned char)*iter);
-	//}
-	//if (!tmp.empty())
-	//{
-	//	Logging::Write(tmp);
-	//}
 
 	int res = ISO7816Pps::IsPpsFrame(pps.ToBytes(), 0);
 	//Logging::Write(std::string("ISO7816Pps::IsPpsFrame: ") + Convert::ToDec(res));
