@@ -13,6 +13,7 @@
 #define ISO7816_ANALYZER_RESULTS
 
 #include <AnalyzerResults.h>
+#include "ProtocolFrames.h"
 
 class iso7816Analyzer;
 class iso7816AnalyzerSettings;
@@ -20,17 +21,26 @@ class iso7816AnalyzerSettings;
 class iso7816AnalyzerResults : public AnalyzerResults
 {
 public:
-	iso7816AnalyzerResults( iso7816Analyzer* analyzer, iso7816AnalyzerSettings* settings );
+	typedef std::shared_ptr<iso7816AnalyzerResults> ptr;
+
+public:
+	iso7816AnalyzerResults(iso7816Analyzer* analyzer, iso7816AnalyzerSettings* settings);
 	virtual ~iso7816AnalyzerResults();
 
-	virtual void GenerateBubbleText( U64 frame_index, Channel& channel, DisplayBase display_base );
-	virtual void GenerateExportFile( const char* file, DisplayBase display_base, U32 export_type_user_id );
+	void AddProtocolFrame(ProtocolFrame::ptr frame);
 
-	virtual void GenerateFrameTabularText(U64 frame_index, DisplayBase display_base );
-	virtual void GeneratePacketTabularText( U64 packet_id, DisplayBase display_base );
-	virtual void GenerateTransactionTabularText( U64 transaction_id, DisplayBase display_base );
+	virtual void GenerateBubbleText(U64 frame_index, Channel& channel, DisplayBase display_base);
+	virtual void GenerateExportFile(const char* file, DisplayBase display_base, U32 export_type_user_id);
+
+	virtual void GenerateFrameTabularText(U64 frame_index, DisplayBase display_base);
+	virtual void GeneratePacketTabularText(U64 packet_id, DisplayBase display_base);
+	virtual void GenerateTransactionTabularText(U64 transaction_id, DisplayBase display_base);
+
+private:
+	ProtocolFrame::ptr FindProtocolFrame(U64 mData1);
 
 protected: //functions
+	std::vector<ProtocolFrame::ptr> _frames;
 
 protected:  //vars
 	iso7816AnalyzerSettings* mSettings;

@@ -24,6 +24,8 @@ public:
 	static std::string ToDec(unsigned int val);
 	static std::string ToDec(int val);
 
+	static unsigned char Msb2Lsb(unsigned char val);
+
 private:
 	Convert();
 	virtual ~Convert();

@@ -9,12 +9,13 @@
 // Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
 //
 
-#include "iso7816AnalyzerResults.h"
-#include <AnalyzerHelpers.h>
-#include "iso7816Analyzer.h"
-#include "iso7816AnalyzerSettings.h"
 #include <iostream>
 #include <fstream>
+#include <algorithm>
+#include <AnalyzerHelpers.h>
+#include "iso7816AnalyzerResults.h"
+#include "iso7816Analyzer.h"
+#include "iso7816AnalyzerSettings.h"
 
 iso7816AnalyzerResults::iso7816AnalyzerResults( iso7816Analyzer* analyzer, iso7816AnalyzerSettings* settings )
 :	AnalyzerResults(),
@@ -26,78 +27,24 @@ iso7816AnalyzerResults::iso7816AnalyzerResults( iso7816Analyzer* analyzer, iso78
 iso7816AnalyzerResults::~iso7816AnalyzerResults()
 {
 }
-#if 0
-void iso7816AnalyzerResults::GenerateBubbleText( U64 frame_index, Channel& channel, DisplayBase display_base )
-{
-	ClearResultStrings();
-	Frame frame = GetFrame( frame_index );
 
-	char number_str[128];
-	AnalyzerHelpers::GetNumberString( frame.mData1, display_base, 8, number_str, 128 );
-	AddResultString( number_str );
+void iso7816AnalyzerResults::AddProtocolFrame(ProtocolFrame::ptr frame)
+{
+	_frames.push_back(frame);
+	AddFrame(*(frame.get()));
+	CommitResults();
 }
-#endif
+
 
 void iso7816AnalyzerResults::GenerateBubbleText(U64 frame_index, Channel& channel, DisplayBase display_base)  //unrefereced vars commented out to remove warnings.
 {
-	char number_str[128];
-    //we only need to pay attention to 'channel' if we're making bubbles for more than one channel (as set by AddChannelBubblesWillAppearOn)
-    ClearResultStrings();
-    Frame frame = GetFrame(frame_index);
+	ClearResultStrings();
 
-	if (channel == mSettings->mResetChannel)
+	Frame frame = GetFrame(frame_index);
+	ProtocolFrame::ptr _frame = FindProtocolFrame(frame.mData1);
+	if (_frame)
 	{
-		switch (frame.mFlags)
-		{
-		case ATR:
-			AddResultString("A");
-			AddResultString("ATR");
-			AddResultString("ATR");
-			break;
-
-		case PPS:
-			AddResultString("P");
-			AddResultString("PPS");
-			AddResultString("PPS: ", ((iso7816Analyzer*)mAnalyzer)->GetDetails(static_cast<int>(frame.mData1)).c_str());
-			break;
-
-		default:
-			break;
-		}
-	}
-	else
-	{
-		switch (frame.mFlags)
-		{
-		case 0:
-			AnalyzerHelpers::GetNumberString(frame.mData1, display_base, 8, number_str, sizeof(number_str));
-			AddResultString(number_str);
-			break;
-
-		case INVERSE:
-			AddResultString("I");
-			AddResultString("INV");
-			AddResultString("Hdr(INVERSE)");
-			break;
-
-		case DIRECT:
-			AddResultString("D");
-			AddResultString("DIR");
-			AddResultString("Hdr(DIRECT)");
-			break;
-
-		case ATR:
-			break;
-
-		case PPS:
-			break;
-
-		default:
-			AddResultString("?");
-			AnalyzerHelpers::GetNumberString(frame.mFlags, display_base, 8, number_str, sizeof(number_str));
-			AddResultString(number_str);
-			break;
-		}
+		_frame->RenderBubbleText(this, channel, display_base);
 	}
 }
 
@@ -153,4 +100,10 @@ void iso7816AnalyzerResults::GenerateTransactionTabularText( U64 transaction_id,
 {
 	ClearResultStrings();
 	AddResultString( "not supported" );
+}
+
+ProtocolFrame::ptr iso7816AnalyzerResults::FindProtocolFrame(U64 mData1)
+{
+	auto it = std::find_if(_frames.begin(), _frames.end(), [=](ProtocolFrame::ptr i) {return i->mData1 == mData1; });
+	return (it == _frames.end()) ? ProtocolFrame::ptr() : (*it);
 }
