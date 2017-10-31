@@ -13,11 +13,16 @@ Files and Directories:
 source
 	Actual source code; including a simple Makefile.
 
-ISO7816Analyser
-	XCode build environment for above source.
+What's new:
+v0.9.0.1 release:
+	- ISO 7816 state machine to parse ATR, optional PPS and T1 transmission
+	- full 7816 compliant ATR parser, including negotiable and specific mode detection
+	- T1 frame parser with I/S/R block decoder
+	- checksum validation - LRC
 	
-VCProj
-	VC2015 build environment for above source.
+How to build it:
+	- XCode build environment for above source.
+	- VC2017 build environment for above source.
 
 Licenses.txt
 	License information.
