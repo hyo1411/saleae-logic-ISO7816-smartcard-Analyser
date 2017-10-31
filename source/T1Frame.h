@@ -23,6 +23,21 @@ class T1Frame : public TxFrame
 {
 public:
 	// definitions
+	enum Definitions
+	{
+		BLOCK_MASK = 0xC0,
+		TAG_I_BLOCK1 = 0x00,
+		TAG_I_BLOCK2 = 0x40,
+		TAG_R_BLOCK = 0x80,
+		TAG_S_BLOCK = 0xc0
+	};
+	enum BlockType
+	{
+		Unknown,
+		I_BLOCK,
+		S_BLOCK,
+		R_BLOCK
+	};
 	enum Position
 	{
 		NAD = 0,
@@ -34,6 +49,7 @@ public:
 	};
 
 private:
+	BlockType _blockType = Unknown;
 	Position _pos = Position::NAD;
 	unsigned char _nad = 0;
 	unsigned char _pcb = 0;
@@ -106,6 +122,7 @@ public:
 	virtual std::string ToString()
 	{
 		std::stringstream ss;
+		RenderBlockType(ss, _blockType);
 		RenderTokenWithHexValue(ss, std::string("NAD"), _nad);
 		ss << " ";
 		RenderTokenWithHexValue(ss, std::string("PCB"), _pcb);
@@ -128,6 +145,7 @@ protected:
 
 	void OnPCB(unsigned char data)
 	{
+		DetermineBlockType(data);
 		_pcb = data;
 		_pos = LEN;
 		_lastElementName = "PCB";
@@ -136,7 +154,7 @@ protected:
 	void OnLEN(unsigned char data)
 	{
 		_len = data;
-		_pos = INF;
+		_pos = _len > 0 ? INF : LRC;
 		_lastElementName = "LEN";
 	}
 
@@ -170,6 +188,43 @@ private:
 	{
 	}
 
+	void DetermineBlockType(unsigned char data)
+	{
+		unsigned char tmp = data & Definitions::BLOCK_MASK;
+		switch (tmp)
+		{
+		case Definitions::TAG_I_BLOCK1:
+		case Definitions::TAG_I_BLOCK2:
+			_blockType = BlockType::I_BLOCK;
+			break;
+		case Definitions::TAG_R_BLOCK:
+			_blockType = BlockType::R_BLOCK;
+			break;
+		case Definitions::TAG_S_BLOCK:
+			_blockType = BlockType::S_BLOCK;
+			break;
+		}
+	}
+
+	void RenderBlockType(std::stringstream& ss, BlockType bt)
+	{
+		switch (bt)
+		{
+		case BlockType::Unknown:
+			ss << "Unknown ";
+			break;
+		case BlockType::I_BLOCK:
+			ss << "I-BLOCK ";
+			break;
+		case BlockType::R_BLOCK:
+			ss << "R-BLOCK ";
+			break;
+		case BlockType::S_BLOCK:
+			ss << "S-BLOCK ";
+			break;
+		}
+	}
+
 	void RenderTokenWithHexValue(std::stringstream& ss, std::string& name, unsigned char val)
 	{
 		ss << name << "(";
@@ -191,7 +246,6 @@ private:
 	{
 		ss << std::noshowbase << std::uppercase << std::hex << std::setw(2) << std::setfill('0') << (int)val;
 	}
-
 
 };
 
