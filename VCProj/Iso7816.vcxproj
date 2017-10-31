@@ -167,8 +167,10 @@
     <ClInclude Include="../source/Logging.hpp" />
     <ClInclude Include="../source/SaleaeHelper.hpp" />
     <ClInclude Include="..\source\ISO7816Atr.hpp" />
-    <ClInclude Include="..\source\ProtocolFrames.h" />
     <ClInclude Include="..\source\Iso7816Session.h" />
+    <ClInclude Include="..\source\ProtocolFrames.h" />
+    <ClInclude Include="..\source\T1Frame.h" />
+    <ClInclude Include="..\source\TxFrame.h" />
     <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
@@ -180,8 +182,8 @@
     <ClCompile Include="../source/iso7816SimulationDataGenerator.cpp" />
     <ClCompile Include="../source/Logging.cpp" />
     <ClCompile Include="../source/SaleaeHelper.cpp" />
-    <ClCompile Include="..\source\ProtocolFrames.cpp" />
     <ClCompile Include="..\source\Iso7816Session.cpp" />
+    <ClCompile Include="..\source\ProtocolFrames.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc" />

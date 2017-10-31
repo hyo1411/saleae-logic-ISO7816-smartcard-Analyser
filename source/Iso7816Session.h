@@ -15,6 +15,7 @@
 #include "ISO7816Atr.hpp"
 #include "ISO7816Pps.hpp"
 #include "iso7816AnalyzerResults.h"
+#include "TxFrame.h"
 
 class Iso7816Session
 {
@@ -34,6 +35,13 @@ public:
 		Transmission,
 		Unknown
 	};
+
+	enum Protocol
+	{
+		T0 = 0,
+		T1 = 1
+	};
+
 
 public:
 	typedef std::shared_ptr<Iso7816Session> ptr;
@@ -65,6 +73,9 @@ protected:
 	SessionState _state = SessionState::Start;
 	ISO7816Atr::ptr _atr;
 	ISO7816Pps::ptr _pps;
+
+	Protocol _prot;
+	TxFrame::ptr _txframe;
 };
 
 #endif //ISO7816_SESSION_H

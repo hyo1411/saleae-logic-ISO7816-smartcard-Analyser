@@ -14,6 +14,7 @@
 #include "Logging.hpp"
 #include "Definitions.hpp"
 #include "iso7816AnalyzerResults.h"
+#include "T1Frame.h"
 
 Iso7816Session::ptr Iso7816Session::factory(iso7816AnalyzerResults::ptr results, Iso7816Session::u64 initialEtu, unsigned int chlBytes, unsigned int chlFrames)
 {
@@ -115,6 +116,11 @@ void Iso7816Session::OnAtr()
 			unsigned char _di = _ta1 & 0x0f;
 			_etu = static_cast<u64>(ISO7816Pps::CalculateETU(_fi, _di));
 			Logging::Write(std::string("The new ETU value is: ") + Convert::ToDec(_etu));
+
+			unsigned char _ta2 = _atr->GetInterfaceByte(ISO7816Atr::Tx::TA, 2);
+			_prot = (Protocol)(_ta2 & 0x0f);
+			Logging::Write(std::string("Selected protocol is: T") + Convert::ToDec(_prot));
+
 			_state = SessionState::Transmission;
 		}
 		else
@@ -177,6 +183,8 @@ void Iso7816Session::OnPps()
 			Logging::Write(std::string("PPS detected, fi: ") + Convert::ToDec(frm1->GetFi()) + std::string(", di: ") + Convert::ToDec(frm1->GetDi()));
 			_etu = static_cast<u64>(ISO7816Pps::CalculateETU(frm1->GetFi(), frm1->GetDi()));
 			Logging::Write(std::string("New ETU: ") + Convert::ToDec(_etu));
+			_prot = (Protocol)frm1->GetProtocol();
+			Logging::Write(std::string("Selected protocol is: T") + Convert::ToDec(_prot));
 
 			{
 				ProtocolFrame::ptr frame = TextFrame::factory(_chlFrames, "P", "PPS", frm1->ToString(), _buff[0].GetStartPos(), _buff.rbegin()->GetEndPos());
@@ -192,6 +200,26 @@ void Iso7816Session::OnPps()
 
 void Iso7816Session::OnTransmission()
 {
+	if (_prot == Protocol::T1)
+	{
+		if (!_txframe)
+		{
+			_txframe = T1Frame::factory();
+		}
+		_txframe->PushData(_buff.rbegin()->GetValue());
+		{
+			ProtocolFrame::ptr frame = ByteFrame::factory(_chlBytes, _txframe->GetLastElementName(), _buff.back().GetValue(), _buff.back().GetStartPos(), _buff.back().GetEndPos());
+			_results->AddProtocolFrame(frame);
+		}
+		if (_txframe->Completed())
+		{
+			ProtocolFrame::ptr frame = TextFrame::factory(_chlFrames, _txframe->ToString(), _buff.begin()->GetStartPos(), _buff.rbegin()->GetEndPos());
+			_results->AddProtocolFrame(frame);
+			_buff.clear();
+			_txframe.reset();
+		}
+	}
+	else
 	{
 		ProtocolFrame::ptr frame = ByteFrame::factory(_chlBytes, _buff.back().GetValue(), _buff.back().GetStartPos(), _buff.back().GetEndPos());
 		_results->AddProtocolFrame(frame);

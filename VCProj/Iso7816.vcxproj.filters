@@ -57,11 +57,17 @@
     <ClInclude Include="..\source\ISO7816Atr.hpp">
       <Filter>Util</Filter>
     </ClInclude>
+    <ClInclude Include="..\source\ProtocolFrames.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="..\source\Iso7816Session.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\source\ProtocolFrames.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="..\source\T1Frame.h">
+      <Filter>Util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\TxFrame.h">
+      <Filter>Util</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -89,10 +95,10 @@
     <ClCompile Include="../source/ISO7816Pps.cpp">
       <Filter>Util</Filter>
     </ClCompile>
-    <ClCompile Include="..\source\Iso7816Session.cpp">
+    <ClCompile Include="..\source\ProtocolFrames.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\source\ProtocolFrames.cpp">
+    <ClCompile Include="..\source\Iso7816Session.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
