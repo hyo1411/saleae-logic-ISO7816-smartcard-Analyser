@@ -17,6 +17,30 @@
 		3255679217DEF2840067F677 /* iso7816SimulationDataGenerator.h in Headers */ = {isa = PBXBuildFile; fileRef = 3255678A17DEF2840067F677 /* iso7816SimulationDataGenerator.h */; };
 		3255679517DEF2F00067F677 /* libAnalyzer.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 3255679417DEF2F00067F677 /* libAnalyzer.dylib */; };
 		3255679817DEF48D0067F677 /* libISO7816Analyser.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 3255677C17DEF2440067F677 /* libISO7816Analyser.dylib */; };
+		69BC8EE01FAD1D0900E9B171 /* ByteBuffer.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 69BC8EC81FAD1D0900E9B171 /* ByteBuffer.hpp */; };
+		69BC8EE11FAD1D0900E9B171 /* ByteElement.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 69BC8EC91FAD1D0900E9B171 /* ByteElement.hpp */; };
+		69BC8EE21FAD1D0900E9B171 /* Convert.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 69BC8ECA1FAD1D0900E9B171 /* Convert.cpp */; };
+		69BC8EE31FAD1D0900E9B171 /* Convert.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 69BC8ECB1FAD1D0900E9B171 /* Convert.hpp */; };
+		69BC8EE41FAD1D0900E9B171 /* Definitions.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 69BC8ECC1FAD1D0900E9B171 /* Definitions.hpp */; };
+		69BC8EE51FAD1D0900E9B171 /* Exceptions.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 69BC8ECD1FAD1D0900E9B171 /* Exceptions.hpp */; };
+		69BC8EE61FAD1D0900E9B171 /* ISO7816Atr.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 69BC8ECE1FAD1D0900E9B171 /* ISO7816Atr.cpp */; };
+		69BC8EE71FAD1D0900E9B171 /* ISO7816Atr.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 69BC8ECF1FAD1D0900E9B171 /* ISO7816Atr.hpp */; };
+		69BC8EE81FAD1D0900E9B171 /* Iso7816BitDecoder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 69BC8ED01FAD1D0900E9B171 /* Iso7816BitDecoder.cpp */; };
+		69BC8EE91FAD1D0900E9B171 /* Iso7816BitDecoder.h in Headers */ = {isa = PBXBuildFile; fileRef = 69BC8ED11FAD1D0900E9B171 /* Iso7816BitDecoder.h */; };
+		69BC8EEA1FAD1D0900E9B171 /* ISO7816Pps.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 69BC8ED21FAD1D0900E9B171 /* ISO7816Pps.cpp */; };
+		69BC8EEB1FAD1D0900E9B171 /* ISO7816Pps.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 69BC8ED31FAD1D0900E9B171 /* ISO7816Pps.hpp */; };
+		69BC8EEC1FAD1D0900E9B171 /* Iso7816Session.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 69BC8ED41FAD1D0900E9B171 /* Iso7816Session.cpp */; };
+		69BC8EED1FAD1D0900E9B171 /* Iso7816Session.h in Headers */ = {isa = PBXBuildFile; fileRef = 69BC8ED51FAD1D0900E9B171 /* Iso7816Session.h */; };
+		69BC8EEE1FAD1D0900E9B171 /* Logging.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 69BC8ED61FAD1D0900E9B171 /* Logging.cpp */; };
+		69BC8EEF1FAD1D0900E9B171 /* Logging.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 69BC8ED71FAD1D0900E9B171 /* Logging.hpp */; };
+		69BC8EF01FAD1D0900E9B171 /* ProtocolFrames.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 69BC8ED81FAD1D0900E9B171 /* ProtocolFrames.cpp */; };
+		69BC8EF11FAD1D0900E9B171 /* ProtocolFrames.h in Headers */ = {isa = PBXBuildFile; fileRef = 69BC8ED91FAD1D0900E9B171 /* ProtocolFrames.h */; };
+		69BC8EF21FAD1D0900E9B171 /* SaleaeHelper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 69BC8EDA1FAD1D0900E9B171 /* SaleaeHelper.cpp */; };
+		69BC8EF31FAD1D0900E9B171 /* SaleaeHelper.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 69BC8EDB1FAD1D0900E9B171 /* SaleaeHelper.hpp */; };
+		69BC8EF41FAD1D0900E9B171 /* T1Frame.h in Headers */ = {isa = PBXBuildFile; fileRef = 69BC8EDC1FAD1D0900E9B171 /* T1Frame.h */; };
+		69BC8EF51FAD1D0900E9B171 /* TxFrame.h in Headers */ = {isa = PBXBuildFile; fileRef = 69BC8EDD1FAD1D0900E9B171 /* TxFrame.h */; };
+		69BC8EF61FAD1D0900E9B171 /* Util.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 69BC8EDE1FAD1D0900E9B171 /* Util.cpp */; };
+		69BC8EF71FAD1D0900E9B171 /* Util.h in Headers */ = {isa = PBXBuildFile; fileRef = 69BC8EDF1FAD1D0900E9B171 /* Util.h */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -43,7 +67,32 @@
 		3255678917DEF2840067F677 /* iso7816AnalyzerResults.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = iso7816AnalyzerResults.h; path = ../source/iso7816AnalyzerResults.h; sourceTree = "<group>"; };
 		3255678A17DEF2840067F677 /* iso7816SimulationDataGenerator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = iso7816SimulationDataGenerator.h; path = ../source/iso7816SimulationDataGenerator.h; sourceTree = "<group>"; };
 		3255679417DEF2F00067F677 /* libAnalyzer.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libAnalyzer.dylib; path = /Applications/Logic.app/Contents/MacOS/libAnalyzer.dylib; sourceTree = "<absolute>"; };
-		3255679A17DEF91C0067F677 /* Licenses.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Licenses.txt; sourceTree = "<group>"; };
+		69BC8EC81FAD1D0900E9B171 /* ByteBuffer.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = ByteBuffer.hpp; path = ../source/ByteBuffer.hpp; sourceTree = "<group>"; };
+		69BC8EC91FAD1D0900E9B171 /* ByteElement.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = ByteElement.hpp; path = ../source/ByteElement.hpp; sourceTree = "<group>"; };
+		69BC8ECA1FAD1D0900E9B171 /* Convert.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Convert.cpp; path = ../source/Convert.cpp; sourceTree = "<group>"; };
+		69BC8ECB1FAD1D0900E9B171 /* Convert.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = Convert.hpp; path = ../source/Convert.hpp; sourceTree = "<group>"; };
+		69BC8ECC1FAD1D0900E9B171 /* Definitions.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = Definitions.hpp; path = ../source/Definitions.hpp; sourceTree = "<group>"; };
+		69BC8ECD1FAD1D0900E9B171 /* Exceptions.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = Exceptions.hpp; path = ../source/Exceptions.hpp; sourceTree = "<group>"; };
+		69BC8ECE1FAD1D0900E9B171 /* ISO7816Atr.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ISO7816Atr.cpp; path = ../source/ISO7816Atr.cpp; sourceTree = "<group>"; };
+		69BC8ECF1FAD1D0900E9B171 /* ISO7816Atr.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = ISO7816Atr.hpp; path = ../source/ISO7816Atr.hpp; sourceTree = "<group>"; };
+		69BC8ED01FAD1D0900E9B171 /* Iso7816BitDecoder.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Iso7816BitDecoder.cpp; path = ../source/Iso7816BitDecoder.cpp; sourceTree = "<group>"; };
+		69BC8ED11FAD1D0900E9B171 /* Iso7816BitDecoder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Iso7816BitDecoder.h; path = ../source/Iso7816BitDecoder.h; sourceTree = "<group>"; };
+		69BC8ED21FAD1D0900E9B171 /* ISO7816Pps.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ISO7816Pps.cpp; path = ../source/ISO7816Pps.cpp; sourceTree = "<group>"; };
+		69BC8ED31FAD1D0900E9B171 /* ISO7816Pps.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = ISO7816Pps.hpp; path = ../source/ISO7816Pps.hpp; sourceTree = "<group>"; };
+		69BC8ED41FAD1D0900E9B171 /* Iso7816Session.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Iso7816Session.cpp; path = ../source/Iso7816Session.cpp; sourceTree = "<group>"; };
+		69BC8ED51FAD1D0900E9B171 /* Iso7816Session.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Iso7816Session.h; path = ../source/Iso7816Session.h; sourceTree = "<group>"; };
+		69BC8ED61FAD1D0900E9B171 /* Logging.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Logging.cpp; path = ../source/Logging.cpp; sourceTree = "<group>"; };
+		69BC8ED71FAD1D0900E9B171 /* Logging.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = Logging.hpp; path = ../source/Logging.hpp; sourceTree = "<group>"; };
+		69BC8ED81FAD1D0900E9B171 /* ProtocolFrames.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ProtocolFrames.cpp; path = ../source/ProtocolFrames.cpp; sourceTree = "<group>"; };
+		69BC8ED91FAD1D0900E9B171 /* ProtocolFrames.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ProtocolFrames.h; path = ../source/ProtocolFrames.h; sourceTree = "<group>"; };
+		69BC8EDA1FAD1D0900E9B171 /* SaleaeHelper.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SaleaeHelper.cpp; path = ../source/SaleaeHelper.cpp; sourceTree = "<group>"; };
+		69BC8EDB1FAD1D0900E9B171 /* SaleaeHelper.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = SaleaeHelper.hpp; path = ../source/SaleaeHelper.hpp; sourceTree = "<group>"; };
+		69BC8EDC1FAD1D0900E9B171 /* T1Frame.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = T1Frame.h; path = ../source/T1Frame.h; sourceTree = "<group>"; };
+		69BC8EDD1FAD1D0900E9B171 /* TxFrame.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TxFrame.h; path = ../source/TxFrame.h; sourceTree = "<group>"; };
+		69BC8EDE1FAD1D0900E9B171 /* Util.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Util.cpp; path = ../source/Util.cpp; sourceTree = "<group>"; };
+		69BC8EDF1FAD1D0900E9B171 /* Util.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Util.h; path = ../source/Util.h; sourceTree = "<group>"; };
+		69BC8EF81FAD1DEF00E9B171 /* Licenses.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = Licenses.txt; path = ../Licenses.txt; sourceTree = "<group>"; };
+		69BC8EF91FAD1E1100E9B171 /* README.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = README.txt; path = ../README.txt; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -61,7 +110,8 @@
 		3255677317DEF2440067F677 = {
 			isa = PBXGroup;
 			children = (
-				3255679A17DEF91C0067F677 /* Licenses.txt */,
+				69BC8EF91FAD1E1100E9B171 /* README.txt */,
+				69BC8EF81FAD1DEF00E9B171 /* Licenses.txt */,
 				3255679617DEF4550067F677 /* Frameworks */,
 				3255679317DEF2890067F677 /* sources */,
 				3255677D17DEF2440067F677 /* Products */,
@@ -79,6 +129,30 @@
 		3255679317DEF2890067F677 /* sources */ = {
 			isa = PBXGroup;
 			children = (
+				69BC8EC81FAD1D0900E9B171 /* ByteBuffer.hpp */,
+				69BC8EC91FAD1D0900E9B171 /* ByteElement.hpp */,
+				69BC8ECA1FAD1D0900E9B171 /* Convert.cpp */,
+				69BC8ECB1FAD1D0900E9B171 /* Convert.hpp */,
+				69BC8ECC1FAD1D0900E9B171 /* Definitions.hpp */,
+				69BC8ECD1FAD1D0900E9B171 /* Exceptions.hpp */,
+				69BC8ECE1FAD1D0900E9B171 /* ISO7816Atr.cpp */,
+				69BC8ECF1FAD1D0900E9B171 /* ISO7816Atr.hpp */,
+				69BC8ED01FAD1D0900E9B171 /* Iso7816BitDecoder.cpp */,
+				69BC8ED11FAD1D0900E9B171 /* Iso7816BitDecoder.h */,
+				69BC8ED21FAD1D0900E9B171 /* ISO7816Pps.cpp */,
+				69BC8ED31FAD1D0900E9B171 /* ISO7816Pps.hpp */,
+				69BC8ED41FAD1D0900E9B171 /* Iso7816Session.cpp */,
+				69BC8ED51FAD1D0900E9B171 /* Iso7816Session.h */,
+				69BC8ED61FAD1D0900E9B171 /* Logging.cpp */,
+				69BC8ED71FAD1D0900E9B171 /* Logging.hpp */,
+				69BC8ED81FAD1D0900E9B171 /* ProtocolFrames.cpp */,
+				69BC8ED91FAD1D0900E9B171 /* ProtocolFrames.h */,
+				69BC8EDA1FAD1D0900E9B171 /* SaleaeHelper.cpp */,
+				69BC8EDB1FAD1D0900E9B171 /* SaleaeHelper.hpp */,
+				69BC8EDC1FAD1D0900E9B171 /* T1Frame.h */,
+				69BC8EDD1FAD1D0900E9B171 /* TxFrame.h */,
+				69BC8EDE1FAD1D0900E9B171 /* Util.cpp */,
+				69BC8EDF1FAD1D0900E9B171 /* Util.h */,
 				3255678517DEF2840067F677 /* iso7816Analyzer.h */,
 				3255678417DEF2840067F677 /* iso7816Analyzer.cpp */,
 				3255678A17DEF2840067F677 /* iso7816SimulationDataGenerator.h */,
@@ -106,10 +180,25 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				69BC8EF11FAD1D0900E9B171 /* ProtocolFrames.h in Headers */,
+				69BC8EF31FAD1D0900E9B171 /* SaleaeHelper.hpp in Headers */,
+				69BC8EEF1FAD1D0900E9B171 /* Logging.hpp in Headers */,
+				69BC8EE51FAD1D0900E9B171 /* Exceptions.hpp in Headers */,
+				69BC8EE31FAD1D0900E9B171 /* Convert.hpp in Headers */,
+				69BC8EE41FAD1D0900E9B171 /* Definitions.hpp in Headers */,
+				69BC8EF51FAD1D0900E9B171 /* TxFrame.h in Headers */,
+				69BC8EE01FAD1D0900E9B171 /* ByteBuffer.hpp in Headers */,
+				69BC8EEB1FAD1D0900E9B171 /* ISO7816Pps.hpp in Headers */,
 				3255678D17DEF2840067F677 /* iso7816Analyzer.h in Headers */,
 				3255679017DEF2840067F677 /* iso7816AnalyzerSettings.h in Headers */,
+				69BC8EF41FAD1D0900E9B171 /* T1Frame.h in Headers */,
+				69BC8EE71FAD1D0900E9B171 /* ISO7816Atr.hpp in Headers */,
 				3255679117DEF2840067F677 /* iso7816AnalyzerResults.h in Headers */,
+				69BC8EED1FAD1D0900E9B171 /* Iso7816Session.h in Headers */,
+				69BC8EF71FAD1D0900E9B171 /* Util.h in Headers */,
 				3255679217DEF2840067F677 /* iso7816SimulationDataGenerator.h in Headers */,
+				69BC8EE91FAD1D0900E9B171 /* Iso7816BitDecoder.h in Headers */,
+				69BC8EE11FAD1D0900E9B171 /* ByteElement.hpp in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -141,7 +230,7 @@
 		3255677417DEF2440067F677 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0460;
+				LastUpgradeCheck = 0820;
 				ORGANIZATIONNAME = "Dirk-Willem van Gulik";
 			};
 			buildConfigurationList = 3255677717DEF2440067F677 /* Build configuration list for PBXProject "ISO7816Analyser" */;
@@ -183,10 +272,19 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				69BC8EE21FAD1D0900E9B171 /* Convert.cpp in Sources */,
 				3255678B17DEF2840067F677 /* iso7816AnalyzerResults.cpp in Sources */,
 				3255678C17DEF2840067F677 /* iso7816Analyzer.cpp in Sources */,
+				69BC8EF61FAD1D0900E9B171 /* Util.cpp in Sources */,
+				69BC8EEE1FAD1D0900E9B171 /* Logging.cpp in Sources */,
+				69BC8EEA1FAD1D0900E9B171 /* ISO7816Pps.cpp in Sources */,
 				3255678E17DEF2840067F677 /* iso7816SimulationDataGenerator.cpp in Sources */,
+				69BC8EF01FAD1D0900E9B171 /* ProtocolFrames.cpp in Sources */,
+				69BC8EEC1FAD1D0900E9B171 /* Iso7816Session.cpp in Sources */,
+				69BC8EF21FAD1D0900E9B171 /* SaleaeHelper.cpp in Sources */,
+				69BC8EE81FAD1D0900E9B171 /* Iso7816BitDecoder.cpp in Sources */,
 				3255678F17DEF2840067F677 /* iso7816AnalyzerSettings.cpp in Sources */,
+				69BC8EE61FAD1D0900E9B171 /* ISO7816Atr.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -197,18 +295,24 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
@@ -217,7 +321,9 @@
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				MACOSX_DEPLOYMENT_TARGET = 10.8;
 				ONLY_ACTIVE_ARCH = YES;
@@ -229,21 +335,28 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				MACOSX_DEPLOYMENT_TARGET = 10.8;
 				SDKROOT = macosx;
@@ -253,7 +366,6 @@
 		3255678117DEF2440067F677 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				EXECUTABLE_PREFIX = lib;
 				HEADER_SEARCH_PATHS = "../SaleaeAnalyzerSdk-1.1.9/include";
 				LIBRARY_SEARCH_PATHS = (
@@ -267,7 +379,6 @@
 		3255678217DEF2440067F677 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				EXECUTABLE_PREFIX = lib;
 				HEADER_SEARCH_PATHS = "../SaleaeAnalyzerSdk-1.1.9/include";
 				LIBRARY_SEARCH_PATHS = (
@@ -297,6 +408,7 @@
 				3255678217DEF2440067F677 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
