@@ -24,6 +24,8 @@
 #include "ISO7816Pps.hpp"
 #include "ISO7816Atr.hpp"
 #include "ProtocolFrames.h"
+#include "Iso7816Session.h"
+#include "Iso7816BitDecoder.h"
 
 typedef enum {
 	DIRECT	= 0x02,
@@ -52,8 +54,12 @@ public:
 
 private:
 	virtual void _WorkerThread();
-
+	void SeekForNextStartBit(Iso7816BitDecoder::ptr decoder, Iso7816Session::ptr session);
+	unsigned char DecodeByte(Iso7816BitDecoder::ptr decoder, Iso7816Session::ptr session);
 	bool IsValidETU(U64 ea);
+
+	void LogEvent(U64 position, std::string& msg);
+	void AddMarker(U64 position, AnalyzerResults::MarkerType mt, Channel& channel);
 
 private: //vars
 	std::unique_ptr<iso7816AnalyzerSettings> mSettings;

@@ -25,7 +25,7 @@ U64 SaleaeHelper::AdvanceClkCycles(AnalyzerChannelData* channel, U64 cycles)
 bool SaleaeHelper::CanAdvanceToAbsPosition(AnalyzerChannelData* channel, U64 position)
 {
 	U64 _current = channel->GetSampleNumber();
-	return position > _current;
+	return position >= _current;
 }
 
 U32 SaleaeHelper::AdvanceToAbsPositionOrThrow(AnalyzerChannelData* channel, U64 position, std::string& name)

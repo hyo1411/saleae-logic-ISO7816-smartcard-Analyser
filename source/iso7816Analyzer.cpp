@@ -19,18 +19,11 @@
 #include <AnalyzerResults.h>
 #include "Logging.hpp"
 #include "Convert.hpp"
+#include "Util.h"
+#include "Exceptions.hpp"
 #include "SaleaeHelper.hpp"
 #include "Definitions.hpp"
 #include "ISO7816Pps.hpp"
-#include "Iso7816Session.h"
-
-static const bool parity[256] = 
-{
-#   define P2(n) n, n^1, n^1, n
-#   define P4(n) P2(n), P2(n^1), P2(n^1), P2(n)
-#   define P6(n) P4(n), P4(n^1), P4(n^1), P4(n)
-    P6(0), P6(1), P6(1), P6(0)
-};
 
 iso7816Analyzer::iso7816Analyzer()
 :	Analyzer2(),  
@@ -83,217 +76,194 @@ void iso7816Analyzer::_WorkerThread()
 	mVcc = GetAnalyzerChannelData(mSettings->mVccChannel);
 	mClk = GetAnalyzerChannelData(mSettings->mClkChannel);
 
-	for( ; ; )
+	Iso7816BitDecoder::ptr decoder = Iso7816BitDecoder::factory(mIo, mReset, mVcc, mClk);
+
+	for (; ; )
 	{
-		// seek for a RESET going high.
-		//
-		Logging::Write(std::string("Looking for RST going high..."));
-		mReset->AdvanceToNextEdge();
+		try {
+			// seek for a RESET going high.
+			Logging::Write(std::string("Looking for RST going high..."));
 
-		if (mReset->GetBitState() != BIT_HIGH)
-		{
-			Logging::Write(std::string("Not this time..."));
-			continue;
-		}
-
-		// discard all serial data until now.
-		U64 reset = mReset->GetSampleNumber();
-		Logging::Write(std::string("Reset detected: ") + Convert::ToDec(reset));
-		SaleaeHelper::AdvanceToAbsPositionOrThrow(mIo, reset, std::string("I/O"));
-
-		// mark the start in pretty much all channels.
-		//
-		// mResults->AddMarker(mReset->GetSampleNumber(), AnalyzerResults::UpArrow, mSettings->mResetChannel);
-		// mResults->AddMarker(mIo->GetSampleNumber(), AnalyzerResults::UpArrow, mSettings->mIoChannel);
-
-		// We know expect a TS (After some 400 to 40k clock cycles of idleness XX).
-		// We can use the first up/down dip to measure the baud rate.
-		//
-		//  S01234567P     S01234567P
-		// HLHHLLLLLLH or HLHHLHHHLLH
-		//   11000000 1     11011100 1
- 		//   xC0            xDC
-		// inverse        direct convention
-		//
-		// search for first stop bit.
-		//
-
-		Iso7816Session::ptr _session;
-		U64 a0 = 0;
-		while (true)
-		{
-			SaleaeHelper::AdvanceToAbsPositionOrThrow(mClk, mIo->GetSampleNumber(), std::string("CLK"));
-			U64 startBit = SaleaeHelper::AdvanceClkCycles(mClk, 400);
-			Logging::Write(std::string("Start bit seeking: ") + Convert::ToDec(startBit));
-			SaleaeHelper::AdvanceToAbsPositionOrThrow(mIo, startBit, std::string("I/O"));
-			SaleaeHelper::AdvanceToAbsPositionOrThrow(mReset, startBit, std::string("RST"));
-			mResults->AddMarker(reset, AnalyzerResults::UpArrow, mSettings->mResetChannel);
-
-			// seeking for falling edge
-			while (mIo->GetBitState() != BIT_HIGH)
+			U64 fallingIoEdge = 0;
+			bool high = false;
+			U64 pos = decoder->SeekForResetEdge(high);
+			if (!high)
 			{
-				mIo->AdvanceToNextEdge();
-			}
-
-			mIo->AdvanceToNextEdge();
-			a0 = mIo->GetSampleNumber();
-			mIo->AdvanceToNextEdge();
-			U64 a1 = mIo->GetSampleNumber();
-
-			SaleaeHelper::AdvanceToAbsPositionOrThrow(mClk, a0, std::string("CLK"));
-			U64 clocks = SaleaeHelper::AdvanceToAbsPositionOrThrow(mClk, a1, std::string("CLK")) / 2;
-			SaleaeHelper::AdvanceToAbsPositionOrThrow(mReset, a1, std::string("RST"));
-
-			// default ETU shoud be 372 
-			if (!IsValidETU(clocks))
-			{
-				Logging::Write(std::string("This is not a valid start bit: ") + Convert::ToDec(clocks) + std::string(" clocks..."));
-				mIo->AdvanceToNextEdge();
-				_session.reset();
+				Logging::Write(std::string("Not this time..."));
 				continue;
 			}
-			_session = Iso7816Session::factory(mResults, clocks, mSettings->mIoChannel.mChannelIndex, mSettings->mResetChannel.mChannelIndex);
 
-			mResults->AddMarker(a0, AnalyzerResults::DownArrow, mSettings->mIoChannel);
-			mResults->AddMarker(a0 + (a1 - a0) / 2, AnalyzerResults::Start, mSettings->mIoChannel);
-			mResults->AddMarker(a1, AnalyzerResults::UpArrow, mSettings->mIoChannel);
-			Logging::Write(std::string("Found the start bit, initial ETU: ") + Convert::ToDec(clocks) + std::string(" clocks..."));
-			break;
-		}
+			// log event
+			AddMarker(pos, AnalyzerResults::UpArrow, mSettings->mResetChannel);
+			LogEvent(pos, std::string("Reset detected"));
 
-		if (!_session || !IsValidETU(_session->GetEtu()))
-		{
-			Logging::Write("Valid start bit not found, skipinng analysis...");
-			mIo->AdvanceToNextEdge();
-			_session.reset();
-			continue;
-		}
+			// discard all serial data until now.
+			decoder->Sync(pos);
 
-		if (mIo->GetBitState() != BIT_HIGH) {
-			mResults->AddMarker(mIo->GetSampleNumber(), AnalyzerResults::ErrorDot, mSettings->mIoChannel);
-			mResults->CommitResults();
-			Logging::Write("Start bit end error");
-			continue;
-		}
-
-
-		U16 data = 0; 
-
-		// move to the center of first data bit
-		U64 bitPos = SaleaeHelper::AdvanceClkCycles(mClk, _session->GetEtu() / 2);
-		U64 pausePos = 0;
-		for (U32 i = 0; i <= 8; i++)
-		{
-			// move to the center of what we're guessing as best as we can
-			SaleaeHelper::AdvanceToAbsPositionOrThrow(mIo, bitPos, std::string("I/O"));
-			SaleaeHelper::AdvanceToAbsPositionOrThrow(mReset, bitPos, std::string("RST"));
-			U8 bit = mIo->GetBitState() ? 1 : 0;
-			mResults->AddMarker(mIo->GetSampleNumber(), bit ? AnalyzerResults::One : AnalyzerResults::Zero, mSettings->mIoChannel);
-			data = (data <<1) | bit;
-			if (i == 8)
+			// 6.2.2 Cold reset
+			Iso7816Session::ptr session;
+			while (true)
 			{
-				pausePos = SaleaeHelper::AdvanceClkCycles(mClk, _session->GetEtu());
-			}
-			else
-			{
-				bitPos = SaleaeHelper::AdvanceClkCycles(mClk, _session->GetEtu());
-			}
-		}
-		bool p = 1 == (data & 1);
-		data >>= 1;
+				/*	At time Tb, RST is put to state H. The answer on I/O shall begin between 400 and 40 000 clock cycles (delay
+					tc) after the rising edge of the signal on RST (at time Tb + tc). If the answer does not begin within 40 000 clock
+					cycles with RST at state H, the interface device shall perform a deactivation.
+				*/
+				pos = decoder->SkipClkCycles(400);
+				decoder->Sync(pos);
 
-		if (parity[data] != p) {
-			mResults->AddMarker(bitPos, AnalyzerResults::ErrorDot, mSettings->mIoChannel);
-			mResults->CommitResults();
-			Logging::Write("Parity error");
-			continue;
-		};
-		
-		mResults->AddMarker(bitPos, AnalyzerResults::Stop, mSettings->mIoChannel);
-		if (mIo->GetBitState() != BIT_HIGH) {
-			Logging::Write("Stop bit not high.");
-			mResults->AddMarker(pausePos, AnalyzerResults::ErrorDot, mSettings->mIoChannel);
-			mResults->CommitResults();
-			continue;
-		};
+				// search for first start bit - falling edge
+				LogEvent(pos, std::string("Seeking for start bit..."));
+				fallingIoEdge = decoder->SeekForIoFallingEdge();
+				decoder->Sync(fallingIoEdge);
+				LogEvent(fallingIoEdge, std::string("Falling I/O edge found"));
 
-		_session->PushByte(static_cast<unsigned char>(data & 0xFF), a0, mIo->GetSampleNumber());
+				// sync lines
+				U64 risingIoEdge = decoder->AdvanceToNextIoEdge();
+				LogEvent(risingIoEdge, std::string("Rising I/O edge found"));
 
-		// now we keep waiting for the next 'down'; start bit
-		// and then read our 10 bits, etc, etc.
-		for(;;)
-		{
-			U64 _nextIo = mIo->GetSampleOfNextEdge();	//without moving, get the sample of the next transition.
-			if (mReset->WouldAdvancingToAbsPositionCauseTransition(_nextIo))
-			{
-				Logging::Write(std::string("A new possible reset detected..."));
+				// We can use the first up/down dip to measure the baud rate.
+				U64 defaultEtu = decoder->CountClkCyclesToPosition(risingIoEdge);
+				decoder->Sync(risingIoEdge);
+
+
+				// default ETU shoud be 372 
+				if (!IsValidETU(defaultEtu))
+				{
+					LogEvent(fallingIoEdge, std::string("This is not a valid start bit: ") + Convert::ToDec(defaultEtu) + std::string(" clocks..."));
+					session.reset();
+					continue;
+				}
+				session = Iso7816Session::factory(mResults, defaultEtu, mSettings->mIoChannel.mChannelIndex, mSettings->mResetChannel.mChannelIndex);
+
+				AddMarker(fallingIoEdge, AnalyzerResults::DownArrow, mSettings->mIoChannel);
+				AddMarker(fallingIoEdge + ((risingIoEdge - fallingIoEdge) / 2), AnalyzerResults::Start, mSettings->mIoChannel);
+				AddMarker(risingIoEdge, AnalyzerResults::UpArrow, mSettings->mIoChannel);
+				LogEvent(fallingIoEdge, std::string("Found the start bit, initial ETU: ") + Convert::ToDec(defaultEtu) + std::string(" clocks..."));
 				break;
 			}
 
-			mIo->AdvanceToNextEdge(); //falling edge -- beginning of the start bit
-			U64 _current = mIo->GetSampleNumber();
+			// decode byte
+			unsigned char data = DecodeByte(decoder, session);
 
-			if (mIo->GetBitState() != BIT_LOW) {
-				mResults->AddMarker(mIo->GetSampleNumber(),
-					AnalyzerResults::ErrorDot, mSettings->mIoChannel);
-				mResults->CommitResults();
-				Logging::Write(std::string("Out of sync with start bit."));
-				continue;
-			};
+			U64 endOfByte = decoder->GetIoPosition();
+			decoder->Sync(endOfByte);
+			session->PushByte(static_cast<unsigned char>(data & 0xFF), fallingIoEdge, endOfByte);
 
-			U64 starting_sample = mIo->GetSampleNumber();
-			// synchronise CLK position
-			SaleaeHelper::AdvanceToAbsPositionOrThrow(mClk, starting_sample, std::string("CLK"));
+			// now we keep waiting for the next 'down'; start bit
+			// and then read our 10 bits, etc, etc.
+			for (;;)
+			{
+				try
+				{
+					SeekForNextStartBit(decoder, session);
+					U64 startPos = decoder->GetIoPosition();
+					unsigned char bt = DecodeByte(decoder, session);
 
-			U64 bitPos = SaleaeHelper::AdvanceClkCycles(mClk, _session->GetEtu() / 2);
-			SaleaeHelper::AdvanceToAbsPositionOrThrow(mIo, bitPos, std::string("I/O"));
-			SaleaeHelper::AdvanceToAbsPositionOrThrow(mReset, bitPos, std::string("RST"));
-			mResults->AddMarker(mIo->GetSampleNumber(), AnalyzerResults::Start, mSettings->mIoChannel);
-
-			U16 data = 0;
-			for(U32 i = 0; i <= 8; i++) {
-
-				bitPos = SaleaeHelper::AdvanceClkCycles(mClk, _session->GetEtu());
-				SaleaeHelper::AdvanceToAbsPositionOrThrow(mIo, bitPos, std::string("I/O"));
-				SaleaeHelper::AdvanceToAbsPositionOrThrow(mReset, bitPos, std::string("RST"));
-
-				U8 bit = mIo->GetBitState() ? 1 : 0;
-				mResults->AddMarker(mIo->GetSampleNumber(), bit ? AnalyzerResults::One : AnalyzerResults::Zero, mSettings->mIoChannel);
-
-				data = (data <<1) | bit;
-			};
-
-			bool p = 1 == (data  & 1);
-			data >>= 1;
-
-			if (parity[ data ] != p) {
-				mResults->AddMarker(mIo->GetSampleNumber(),AnalyzerResults::ErrorDot, mSettings->mIoChannel);
-				mResults->CommitResults();
-				Logging::Write(std::string("Parity error"));
-				break;
-			};
-
-			bitPos = SaleaeHelper::AdvanceClkCycles(mClk, _session->GetEtu());
-			SaleaeHelper::AdvanceToAbsPositionOrThrow(mIo, bitPos, std::string("I/O"));
-			SaleaeHelper::AdvanceToAbsPositionOrThrow(mReset, bitPos, std::string("RST"));
-			if (mIo->GetBitState() != BIT_HIGH) {
-				Logging::Write(std::string("Stop bit not high."));
-				mResults->AddMarker(mIo->GetSampleNumber(), AnalyzerResults::ErrorDot, mSettings->mIoChannel);
-				mResults->CommitResults();
-				break;
-			};
-
-			mResults->AddMarker(mIo->GetSampleNumber(), AnalyzerResults::Stop, mSettings->mIoChannel);
-
-			_session->PushByte(static_cast<unsigned char>(data & 0xFF), starting_sample, mIo->GetSampleNumber());
+					session->PushByte(bt, startPos, decoder->GetIoPosition());
+				}
+				catch (OutOfSyncException& ex)
+				{
+					AddMarker(ex.getPosition(), AnalyzerResults::ErrorDot, mSettings->mIoChannel);
+					LogEvent(ex.getPosition(), std::string("Out of sync with start bit."));
+					continue;
+				}
+				catch (ParityException& ex)
+				{
+					AddMarker(ex.getPosition(), AnalyzerResults::ErrorDot, mSettings->mIoChannel);
+					LogEvent(ex.getPosition(), std::string("Parity error"));
+					break;
+				}
+				catch (ErrorSignalException& ex)
+				{
+					LogEvent(ex.getPosition(), std::string("Stop bit not high."));
+					AddMarker(ex.getPosition(), AnalyzerResults::ErrorDot, mSettings->mIoChannel);
+					break;
+				}
+			}
+		}
+		catch (ResetException& ex)
+		{
+			LogEvent(ex.getPosition(), std::string("Found RESET line change"));
 		}
 	}
+}
+
+void iso7816Analyzer::SeekForNextStartBit(Iso7816BitDecoder::ptr decoder, Iso7816Session::ptr session)
+{
+	// falling edge -- beginning of the start bit
+	U64 fallingIoEdge = decoder->SeekForIoFallingEdge();
+	decoder->Sync(fallingIoEdge);
+	AddMarker(fallingIoEdge, AnalyzerResults::DownArrow, mSettings->mIoChannel);
+	U64 endOfStartBit = decoder->SkipClkCycles(session->GetEtu());
+	AddMarker(fallingIoEdge + ((endOfStartBit - fallingIoEdge) / 2), AnalyzerResults::Start, mSettings->mIoChannel);
+	AddMarker(endOfStartBit, AnalyzerResults::UpArrow, mSettings->mIoChannel);
+	LogEvent(fallingIoEdge, std::string("Found a new start bit"));
+	decoder->Sync(endOfStartBit);
+}
+
+
+unsigned char iso7816Analyzer::DecodeByte(Iso7816BitDecoder::ptr decoder, Iso7816Session::ptr session)
+{
+	// advance to the middle of first bit
+	U64 pos = decoder->SkipClkCycles(session->GetEtu() / 2);
+	LogEvent(pos, std::string("Mooving to the middle of first bit"));
+	decoder->Sync(pos);
+
+	unsigned char data = 0;
+	for (int i = 0; i <= 7; i++) {
+		U8 bit = decoder->GetIoState() ? 1 : 0;
+		AddMarker(pos, bit ? AnalyzerResults::One : AnalyzerResults::Zero, mSettings->mIoChannel);
+		LogEvent(decoder->GetIoPosition(), std::string("Found bit: ") + Convert::ToDec(bit ? 1 : 0));
+
+		// next bit
+		pos = decoder->SkipClkCycles(session->GetEtu());
+		decoder->Sync(pos);
+		LogEvent(pos, std::string("Advanced to the next bit"));
+
+		data = (data << 1) | bit;
+	};
+
+	// now we are right on parity bit
+	bool p = decoder->GetIoState() == BitState::BIT_HIGH ? true : false;
+
+	LogEvent(pos, std::string("Before parity check..."));
+	LogEvent(pos, std::string("Data: ") + Convert::ToHex(data));
+	LogEvent(pos, std::string("Parity: ") + (p ? std::string("true") : std::string("false")));
+	if (Util::Parity(data) != p) {
+		throw ParityException(mIo->GetSampleNumber());
+	};
+
+	// 7.3 Error signal and character repetition
+	/*	As shown in Figure 9, when character parity is incorrect, the receiver shall transmit an error signal on the
+		electrical circuit I/O. Then the receiver shall expect a repetition of the character.
+	*/
+	pos = decoder->SkipClkCycles(session->GetEtu());
+	decoder->Sync(pos);
+	if (mIo->GetBitState() != BIT_HIGH)
+	{
+		throw ErrorSignalException(mIo->GetSampleNumber());
+	};
+
+	mResults->AddMarker(pos, AnalyzerResults::Stop, mSettings->mIoChannel);
+	return static_cast<unsigned char>(data);
 }
 
 bool iso7816Analyzer::IsValidETU(U64 ea)
 {
 	return ea > DEF_ETU_MIN && ea < DEF_ETU_MAX;
 }
+
+void iso7816Analyzer::LogEvent(U64 position, std::string& msg)
+{
+	Logging::Write(std::string("[") + Convert::ToDec(position) + std::string("] ") + msg);
+}
+
+void iso7816Analyzer::AddMarker(U64 position, AnalyzerResults::MarkerType mt, Channel& channel)
+{
+	mResults->AddMarker(position, mt, channel);
+	mResults->CommitResults();
+}
+
 
 bool iso7816Analyzer::NeedsRerun()
 {

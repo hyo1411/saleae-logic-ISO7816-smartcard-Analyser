@@ -179,6 +179,10 @@ public:
 protected:
 	void OnTS(unsigned char data)
 	{
+		// HLHHLLLLLLH or HLHHLHHHLLH
+		//   11000000 1     11011100 1
+		//   xC0            xDC
+		// inverse        direct convention
 		if (data != Order::DIRECT && data != Order::INVERSE)
 		{
 			throw std::exception("Unsupported order byte!");

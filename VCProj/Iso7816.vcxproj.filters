@@ -16,6 +16,9 @@
     <Filter Include="Util">
       <UniqueIdentifier>{40152526-b753-437a-b4c1-3a4fab829fe5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Exceptions">
+      <UniqueIdentifier>{cf0e65a5-ea39-4ae8-be5b-cc3a8892bc16}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="../source/iso7816Analyzer.h">
@@ -69,6 +72,15 @@
     <ClInclude Include="..\source\TxFrame.h">
       <Filter>Util</Filter>
     </ClInclude>
+    <ClInclude Include="..\source\Util.h">
+      <Filter>Util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Exceptions.hpp">
+      <Filter>Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Iso7816BitDecoder.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="../source/iso7816Analyzer.cpp">
@@ -99,6 +111,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\source\Iso7816Session.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Util.cpp">
+      <Filter>Util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Iso7816BitDecoder.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
