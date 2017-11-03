@@ -14,7 +14,11 @@ source
 	Actual source code; including a simple Makefile.
 
 What's new:
-v0.9.0.1 release:
+2017.11.03 - v0.9.2:
+	- bit-decoder rewritten
+	- better support for RESET detection
+
+2017.10.31 - v0.9.0.1:
 	- ISO 7816 state machine to parse ATR, optional PPS and T1 transmission
 	- full 7816 compliant ATR parser, including negotiable and specific mode detection
 	- T1 frame parser with I/S/R block decoder
