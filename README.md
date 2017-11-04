@@ -43,16 +43,20 @@ There are project files available for:
 
 This build assumes that Saleae SDK is available on the same lavel as project folder:
 * On Windows:
-> dir\
->    \Saleae7816
->    \sdk\include
->    \sdk\lib
+```
+dir\
+   \Saleae7816
+   \sdk\include
+   \sdk\lib
+```
 			
 * On Mac:
-> dir/
->    /Saleae7816
->    /AnalyzerSDK/lib/
->    /AnalyzerSDK/include/
+```
+dir/
+   /Saleae7816
+   /AnalyzerSDK/lib/
+   /AnalyzerSDK/include/
+```
 		
 The best way to get Saleae SDK is to clone it directly from GitHub's repository: [AnalyzerSDK](https://github.com/saleae/AnalyzerSDK)
 
