@@ -1,19 +1,21 @@
-This build assumes the SDK to be located in this directory and to be called
+1. About
+--------
+This plugin is developed to be used in Saleae Logic Analyzer application. It implements
+ISO 7816-3 contact protocol decoding. In current release the following features are
+available:
+	- initial ETU recovery using clock signal
+	- cold / warm reset
+	- full ISO compliant ATR parsing (negotiable and specific mode supported)
+	- PPS handling
+	- T1 frames decoding - I/S/R
+	- bytes and frames visialization in Saleae UI
 
-	SaleaeAnalyzerSdk-1.1.23	
-
-Unzipping the SaleaeAnalyzerSdk-1.1.23.zip distribution in this directory
-should do the trick. I norder to compile Windows version unzip the SDK into
-the following directories:
-- ../sdk/include - for headers (*.hpp)
-- ../sdk/lib     - for libraris
-
-Files and Directories:
-
-source
-	Actual source code; including a simple Makefile.
-
-What's new:
+2. Releases
+-----------
+2017.11.04 - v0.9.3:
+	- Mac version available
+	- first release candidate for 1.0
+	
 2017.11.03 - v0.9.2:
 	- bit-decoder rewritten
 	- better support for RESET detection
@@ -24,17 +26,29 @@ What's new:
 	- T1 frame parser with I/S/R block decoder
 	- checksum validation - LRC
 	
-How to build it:
-	- XCode build environment for above source.
-	- VC2017 build environment for above source.
+3. How to build it
+------------------
+There are project files available for:
+	- XCode
+	- Visual Studio 2017
 
-Licenses.txt
-	License information.
+This build assumes that Saleae SDK is available on the same lavel as project folder:
+* On Windows:
+	[projects]
+		\Saleae7816
+		\sdk\include
+		\sdk\lib
+			
+* On Mac:
+	[projects]
+		/Saleae7816
+		/AnalyzerSDK/lib/
+		/AnalyzerSDK/include/
+		
+The best way to get Saleae SDK is to clone it directly from GitHub:
+https://github.com/saleae/AnalyzerSDK.git
 
-README.txt
-	This file
 
-SaleaeAnalyzerSdk-1.1.25
-	Not distrubuted; but expected name and location of the SDK. The makefile
-	and X-Code build files have hardcoded paths to the include.
-	Please download it from: http://support.saleae.com/hc/en-us/categories/200077184-sdks-automation-betas
+4. License information
+----------------------
+Available in Licenses.txt
