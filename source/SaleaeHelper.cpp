@@ -1,4 +1,4 @@
-// Copyright © 2016 Adam Augustyn <adam@augustyn.net>, all rights reserved.
+// Copyright ï¿½ 2016 Adam Augustyn <adam@augustyn.net>, all rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at:
 //
@@ -28,12 +28,12 @@ bool SaleaeHelper::CanAdvanceToAbsPosition(AnalyzerChannelData* channel, U64 pos
 	return position >= _current;
 }
 
-U32 SaleaeHelper::AdvanceToAbsPositionOrThrow(AnalyzerChannelData* channel, U64 position, std::string& name)
+U32 SaleaeHelper::AdvanceToAbsPositionOrThrow(AnalyzerChannelData* channel, U64 position, const std::string& name)
 {
 	if (!CanAdvanceToAbsPosition(channel, position))
 	{
 		std::string msg = std::string("Cannot advance channel '") + name + std::string("' to absolute position: ") + Convert::ToDec(position);
-		throw std::exception(msg.c_str());
+		throw std::runtime_error(msg.c_str());
 	}
 	return channel->AdvanceToAbsPosition(position);
 }

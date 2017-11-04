@@ -1,4 +1,4 @@
-// Copyright © 2017 Adam Augustyn <adam@augustyn.net>, all rights reserved.
+// Copyright ï¿½ 2017 Adam Augustyn <adam@augustyn.net>, all rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at:
 //
@@ -98,7 +98,7 @@ public:
 		}
 		else
 		{
-			throw std::exception("T1 frame has been already parsed, no need for more data!");
+			throw std::runtime_error("T1 frame has been already parsed, no need for more data!");
 		}
 	}
 
@@ -225,17 +225,27 @@ private:
 		}
 	}
 
-	void RenderTokenWithHexValue(std::stringstream& ss, std::string& name, unsigned char val)
+	void RenderTokenWithHexValue(std::stringstream& ss, const std::string& name, unsigned char val)
 	{
-		ss << name << "(";
-		AppendHexByte(ss, val);
-		ss << "h)";
+        RenderTokenWithHexValue(ss, name.c_str(), val);
 	}
 
-	void RenderTokenWithHexValues(std::stringstream& ss, std::string& name, std::vector<unsigned char>& buff)
+    void RenderTokenWithHexValue(std::stringstream& ss, const char* name, unsigned char val)
+    {
+        ss << name << "(";
+        AppendHexByte(ss, val);
+        ss << "h)";
+    }
+    
+    void RenderTokenWithHexValues(std::stringstream& ss, const std::string& name, std::vector<unsigned char>& buff)
+    {
+        RenderTokenWithHexValues(ss, name.c_str(), buff);
+    }
+    
+	void RenderTokenWithHexValues(std::stringstream& ss, const char* name, std::vector<unsigned char>& buff)
 	{
 		ss << name << "(";
-		for each (auto var in buff)
+        for (auto var : buff)
 		{
 			AppendHexByte(ss, var);
 		}

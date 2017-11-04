@@ -1,4 +1,4 @@
-// Copyright © 2017 Adam Augustyn <adam@augustyn.net>, all rights reserved.
+// Copyright ï¿½ 2017 Adam Augustyn <adam@augustyn.net>, all rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at:
 //
@@ -12,6 +12,7 @@
 #include <map>
 #include <vector>
 #include <memory>
+#include <stdexcept>
 #include <iomanip>
 #include "Convert.hpp"
 
@@ -105,7 +106,7 @@ public:
 		}
 		else
 		{
-			throw std::exception("ATR has been already parsed, no need for more data!");
+			throw std::runtime_error("ATR has been already parsed, no need for more data!");
 		}
 	}
 
@@ -121,7 +122,7 @@ public:
 		auto _val = _params.find(_key);
 		if (_val == _params.end())
 		{
-			throw std::exception("Interface byte does not exist!");
+			throw std::runtime_error("Interface byte does not exist!");
 		}
 		return _val->second;
 	}
@@ -146,7 +147,8 @@ public:
 	std::string ToString()
 	{
 		std::stringstream ss;
-		RenderTokenWithHexValue(ss, std::string((_order == Order::DIRECT) ? "DIRECT" : "INVERSE"), _order);
+        std::string tmpStr((_order == Order::DIRECT) ? "DIRECT" : "INVERSE");
+		RenderTokenWithHexValue(ss, tmpStr, _order);
 		ss << " ";
 		
 		for (int i = 1; i <= MAX_Yi; i++)
@@ -159,7 +161,8 @@ public:
 
 		if (_historical.size() > 0)
 		{
-			RenderTokenWithHexValue(ss, std::string("No. of hist."), static_cast<unsigned char>(_historical.size()));
+            tmpStr = std::string("No. of hist.");
+			RenderTokenWithHexValue(ss, tmpStr, static_cast<unsigned char>(_historical.size()));
 			ss << " '";
 			for (auto it= _historical.begin(); it != _historical.end(); it++)
 			{
@@ -170,7 +173,8 @@ public:
 
 		if (_hasTCK)
 		{
-			RenderTokenWithHexValue(ss, std::string("TCK"), _tck);
+            tmpStr = std::string("TCK");
+			RenderTokenWithHexValue(ss, tmpStr, _tck);
 		}
 
 		return ss.str();
@@ -185,7 +189,7 @@ protected:
 		// inverse        direct convention
 		if (data != Order::DIRECT && data != Order::INVERSE)
 		{
-			throw std::exception("Unsupported order byte!");
+			throw std::runtime_error("Unsupported order byte!");
 		}
 		_order = (Order)data;
 		_pos = T0;
@@ -252,7 +256,7 @@ protected:
 		if (_historical_num > 0)
 		{
 			_historical.push_back(data);
-			_lastElementName = std::string("H") + Convert::ToDec(_historical.size());
+			_lastElementName = std::string("H") + Convert::ToDec(static_cast<unsigned int>(_historical.size()));
 			_historical_num--;
 		}
 
@@ -297,7 +301,8 @@ protected:
 		{
 			std::stringstream tmp;
 			tmp << GetTxName(tx) << idx;
-			RenderTokenWithHexValue(ss, tmp.str(), GetInterfaceByte(tx, idx));
+            std::string str = tmp.str();
+			RenderTokenWithHexValue(ss, str, GetInterfaceByte(tx, idx));
 			ss << " ";
 		}
 	}
@@ -314,6 +319,8 @@ protected:
 				return "TC";
 			case Tx::TD:
 				return "TD";
+            default:
+                break;
 		}
 		return "Tx";
 	}

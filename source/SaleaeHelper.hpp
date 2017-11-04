@@ -1,4 +1,4 @@
-// Copyright © 2016 Adam Augustyn <adam@augustyn.net>, all rights reserved.
+// Copyright ï¿½ 2016 Adam Augustyn <adam@augustyn.net>, all rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at:
 //
@@ -19,7 +19,7 @@ class SaleaeHelper
 public:
 	static U64 AdvanceClkCycles(AnalyzerChannelData* channel, U64 cycles);
 	static bool CanAdvanceToAbsPosition(AnalyzerChannelData* channel, U64 position);
-	static U32 AdvanceToAbsPositionOrThrow(AnalyzerChannelData* channel, U64 position, std::string& name);
+	static U32 AdvanceToAbsPositionOrThrow(AnalyzerChannelData* channel, U64 position, const std::string& name);
 
 private:
 	SaleaeHelper() {}

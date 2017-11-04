@@ -58,7 +58,8 @@ private:
 	unsigned char DecodeByte(Iso7816BitDecoder::ptr decoder, Iso7816Session::ptr session);
 	bool IsValidETU(U64 ea);
 
-	void LogEvent(U64 position, std::string& msg);
+	void LogEvent(U64 position, const std::string& msg);
+    void LogEvent(U64 position, const char* msg);
 	void AddMarker(U64 position, AnalyzerResults::MarkerType mt, Channel& channel);
 
 private: //vars

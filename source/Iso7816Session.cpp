@@ -33,7 +33,7 @@ void Iso7816Session::PushByte(unsigned char val, unsigned long long startPos, un
 		case Mode::INVERSE:
 			break;
 		default:
-			throw std::exception("The first byte shoud be C0h (INVERSE) or DCh (DIRECT) only!");
+			throw std::runtime_error("The first byte shoud be C0h (INVERSE) or DCh (DIRECT) only!");
 		}
 		_mode = (Mode)val;
 		_state = SessionState::Atr;
@@ -57,6 +57,8 @@ void Iso7816Session::PushByte(unsigned char val, unsigned long long startPos, un
 	case SessionState::Unknown:
 		OnUnknown();
 		break;
+    default:
+        break;
 	}
 }
 
@@ -80,7 +82,7 @@ unsigned char Iso7816Session::Transform(unsigned char val)
 	}
 	else
 	{
-		throw std::exception("Unsupported mode: INVERSE or DIRECT only!");
+		throw std::runtime_error("Unsupported mode: INVERSE or DIRECT only!");
 	}
 }
 

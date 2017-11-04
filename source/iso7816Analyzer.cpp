@@ -253,9 +253,14 @@ bool iso7816Analyzer::IsValidETU(U64 ea)
 	return ea > DEF_ETU_MIN && ea < DEF_ETU_MAX;
 }
 
-void iso7816Analyzer::LogEvent(U64 position, std::string& msg)
+void iso7816Analyzer::LogEvent(U64 position, const std::string& msg)
 {
 	Logging::Write(std::string("[") + Convert::ToDec(position) + std::string("] ") + msg);
+}
+
+void iso7816Analyzer::LogEvent(U64 position, const char* msg)
+{
+    Logging::Write(std::string("[") + Convert::ToDec(position) + std::string("] ") + std::string(msg));
 }
 
 void iso7816Analyzer::AddMarker(U64 position, AnalyzerResults::MarkerType mt, Channel& channel)
