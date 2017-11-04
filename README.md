@@ -1,4 +1,4 @@
-1. About
+# About
 ---
 This plugin is developed to be used in [Saleae Logic Analyzer](https://www.saleae.com/) application. It implements
 ISO 7816-3 contact protocol decoding. In current release the following features are available:
@@ -11,12 +11,13 @@ ISO 7816-3 contact protocol decoding. In current release the following features 
 * suspend time resistant (no clock)
 
 
-2. Documentation
+
+# Documentation
 ---
 The basic documentation is available from GitHub [doc](doc/) folder
 
 
-3. Releases
+# Releases
 ---
 **2017.11.04 v0.9.3**
 * Mac version available
@@ -33,7 +34,7 @@ The basic documentation is available from GitHub [doc](doc/) folder
 * checksum validation - LRC
 	
 	
-4. How to build it
+# How to build it
 ---
 There are project files available for:
 * XCode
@@ -56,6 +57,6 @@ This build assumes that Saleae SDK is available on the same lavel as project fol
 The best way to get Saleae SDK is to clone it directly from GitHub's repository: [AnalyzerSDK](https://github.com/saleae/AnalyzerSDK)
 
 
-5. License information
+# License information
 ---
 Available in [Licenses.txt](Licenses.txt)
