@@ -43,6 +43,6 @@ For each T1 frame LRC checksum is verified and the result presented as '-OK' or 
 ![LRC verification][t1-lrc]
 **For the time being CRC checksum is not supported yet!**
 
-Also S/R frames are supported, but no details is about their content is presented:
+Also S/R frames are supported, but no details about their content is presented:
 ![T1 sample S-block][t1-sblock]
 

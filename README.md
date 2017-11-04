@@ -1,19 +1,18 @@
 1. About
 ---
-This plugin is developed to be used in Saleae Logic Analyzer application. It implements
-ISO 7816-3 contact protocol decoding. In current release the following features are
-available:
-	- initial ETU recovery using clock signal
-	- cold / warm reset
-	- full ISO compliant ATR parsing (negotiable and specific mode supported)
-	- PPS handling
-	- T1 frames decoding - I/S/R
-	- bytes and frames visialization in Saleae UI
-	- suspend time resistant (no clock)
+This plugin is developed to be used in [Saleae Logic Analyzer](https://www.saleae.com/) application. It implements
+ISO 7816-3 contact protocol decoding. In current release the following features are available:
+* initial ETU recovery using clock signal
+* cold / warm reset
+* full ISO compliant ATR parsing (negotiable and specific mode supported)
+* PPS handling
+* T1 frames decoding - I/S/R
+* bytes and frames visialization in Saleae UI
+* suspend time resistant (no clock)
 
 2. Documentation
 ---
-The basic documentation is available from GitHub [doc folder!](doc/)
+The basic documentation is available from GitHub [doc](doc/) folder
 
 3. Releases
 ---
@@ -50,9 +49,8 @@ This build assumes that Saleae SDK is available on the same lavel as project fol
 			/AnalyzerSDK/lib/
 			/AnalyzerSDK/include/
 		
-The best way to get Saleae SDK is to clone it directly from GitHub's repository:
-[Saleae SDK](https://github.com/saleae/AnalyzerSDK.git)
+The best way to get Saleae SDK is to clone it directly from GitHub's repository: [AnalyzerSDK](https://github.com/saleae/AnalyzerSDK)
 
 5. License information
 ---
-Available in Licenses.txt
+Available in [Licenses.txt](Licenses.txt)
