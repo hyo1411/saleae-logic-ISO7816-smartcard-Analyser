@@ -25,11 +25,12 @@ public:
 	// definitions
 	enum Definitions
 	{
-		BLOCK_MASK = 0xC0,
+		BLOCK_MASK   = 0xC0,
 		TAG_I_BLOCK1 = 0x00,
 		TAG_I_BLOCK2 = 0x40,
-		TAG_R_BLOCK = 0x80,
-		TAG_S_BLOCK = 0xc0
+		TAG_R_BLOCK  = 0x80,
+		TAG_S_BLOCK  = 0xC0,
+		DATA_MASK    = 0x3F
 	};
 	enum BlockType
 	{
@@ -48,8 +49,24 @@ public:
 		Complete
 	};
 
+	enum SBlockData
+	{
+		RESYNCH_REQ  = 0B000000,
+		RESYNCH_RESP = 0B100000,
+		IFS_REQ      = 0B000001,
+		IFS_RESP     = 0B100001,
+		ABORT_REQ    = 0B000010,
+		ABORT_RESP   = 0B100010,
+		WTX_REQ      = 0B000011,
+		WTX_RESP     = 0B100011,
+		DEPRECATED   = 0B100100,
+		RFU          = 0B111111
+	};
+
+
 private:
 	BlockType _blockType = Unknown;
+	SBlockData _sblockData = SBlockData::RFU;
 	Position _pos = Position::NAD;
 	unsigned char _nad = 0;
 	unsigned char _pcb = 0;
@@ -123,6 +140,15 @@ public:
 	{
 		std::stringstream ss;
 		RenderBlockType(ss, _blockType);
+
+		switch (_blockType)
+		{
+		case BlockType::S_BLOCK:
+			{
+				RenderSBlockData(ss, _sblockData);
+			} break;
+		}
+
 		RenderTokenWithHexValue(ss, std::string("NAD"), _nad);
 		ss << " ";
 		RenderTokenWithHexValue(ss, std::string("PCB"), _pcb);
@@ -201,8 +227,10 @@ private:
 			_blockType = BlockType::R_BLOCK;
 			break;
 		case Definitions::TAG_S_BLOCK:
-			_blockType = BlockType::S_BLOCK;
-			break;
+			{
+				_blockType = BlockType::S_BLOCK;
+				_sblockData = static_cast<SBlockData>(data & Definitions::DATA_MASK);
+			} break;
 		}
 	}
 
@@ -221,6 +249,43 @@ private:
 			break;
 		case BlockType::S_BLOCK:
 			ss << "S-BLOCK ";
+			break;
+		}
+	}
+
+	void RenderSBlockData(std::stringstream& ss, SBlockData sbd)
+	{
+		switch (sbd)
+		{
+		case SBlockData::RESYNCH_REQ:
+			ss << "RESYNCH_REQ ";
+			break;
+		case SBlockData::RESYNCH_RESP:
+			ss << "RESYNCH_RESP ";
+			break;
+		case SBlockData::IFS_REQ:
+			ss << "IFS_REQ ";
+			break;
+		case SBlockData::IFS_RESP:
+			ss << "IFS_RESP ";
+			break;
+		case SBlockData::ABORT_REQ:
+			ss << "ABORT_REQ ";
+			break;
+		case SBlockData::ABORT_RESP:
+			ss << "ABORT_RESP ";
+			break;
+		case SBlockData::WTX_REQ:
+			ss << "WTX_REQ ";
+			break;
+		case SBlockData::WTX_RESP:
+			ss << "WTX_RESP ";
+			break;
+		case SBlockData::DEPRECATED:
+			ss << "DEPRECATED ";
+			break;
+		default:
+			ss << "RFU ";
 			break;
 		}
 	}
