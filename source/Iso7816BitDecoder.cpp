@@ -60,7 +60,7 @@ Iso7816BitDecoder::u64 Iso7816BitDecoder::SeekForIoFallingEdge()
 	return _io->GetSampleNumber();
 }
 
-Iso7816BitDecoder::u64 Iso7816BitDecoder::SkipClkCycles(std::size_t cycles)
+Iso7816BitDecoder::u64 Iso7816BitDecoder::AdvanceClkCycles(std::size_t cycles)
 {
 	for (std::size_t i = 0; i < cycles; i++)
 	{
@@ -92,6 +92,11 @@ std::size_t Iso7816BitDecoder::CountClkCyclesToPosition(u64 pos)
 	while (_clk->GetSampleOfNextEdge() < pos)
 	{
 		AdvanceToNextEdgeWithResetDetection(_clk);
+		if (_clk->GetSampleOfNextEdge() > pos)
+		{
+			// not possible to advance more
+			break;
+		}
 		AdvanceToNextEdgeWithResetDetection(_clk);
 		ret++;
 	}

@@ -15,7 +15,8 @@
 class DecoderException : public std::exception
 {
 public:
-	DecoderException(unsigned long long int pos)
+	DecoderException(unsigned long long int pos, const char* msg)
+		: std::exception(msg)
 	{
 		_pos = pos;
 	}
@@ -32,7 +33,7 @@ protected:
 class OutOfSyncException : public DecoderException
 {
 public:
-	OutOfSyncException(unsigned long long int pos) : DecoderException(pos)
+	OutOfSyncException(unsigned long long int pos) : DecoderException(pos, "Out of sync!")
 	{
 	}
 };
@@ -41,7 +42,7 @@ public:
 class ParityException : public DecoderException
 {
 public:
-	ParityException(unsigned long long int pos) : DecoderException(pos)
+	ParityException(unsigned long long int pos) : DecoderException(pos, "Parity error!")
 	{
 	}
 };
@@ -49,7 +50,7 @@ public:
 class ErrorSignalException : public DecoderException
 {
 public:
-	ErrorSignalException(unsigned long long int pos) : DecoderException(pos)
+	ErrorSignalException(unsigned long long int pos) : DecoderException(pos, "Error signal!")
 	{
 	}
 };
@@ -57,7 +58,7 @@ public:
 class ResetException : public DecoderException
 {
 public:
-	ResetException(unsigned long long int pos) : DecoderException(pos)
+	ResetException(unsigned long long int pos) : DecoderException(pos, "Reset")
 	{
 	}
 };

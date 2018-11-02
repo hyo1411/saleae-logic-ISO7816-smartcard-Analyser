@@ -2,11 +2,15 @@
 // Copyright © 2013 Dirk-Willem van Gulik <dirkx@webweaving.org>, all rights reserved.
 // Copyright © 2016 Adam Augustyn <adam@augustyn.net>, all rights reserved.
 //
-// Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at:
+// Licensed under the Apache License, Version 2.0 (the "License"); you may not use this 
+// file except in compliance with the License. You may obtain a copy of the License at:
 //
 // http://www.apache.org/licenses/LICENSE-2.0
 //
-// Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
+// Unless required by applicable law or agreed to in writing, software distributed under 
+// the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF 
+// ANY KIND, either express or implied. See the License for the specific language 
+// governing permissions and limitations under the License.
 //
 
 
@@ -78,6 +82,7 @@ void iso7816Analyzer::_WorkerThread()
 
 	Iso7816BitDecoder::ptr decoder = Iso7816BitDecoder::factory(mIo, mReset, mVcc, mClk);
 
+	int resetCounter = 0;
 	for (; ; )
 	{
 		try {
@@ -87,6 +92,15 @@ void iso7816Analyzer::_WorkerThread()
 			U64 fallingIoEdge = 0;
 			bool high = false;
 			U64 pos = decoder->SeekForResetEdge(high);
+			resetCounter++;
+
+			{
+				std::string msg = std::string("R:") + Convert::ToDec(resetCounter);
+				Logging::Write(msg);
+				ProtocolFrame::ptr frame = TextFrame::factory(mSettings->mResetChannel.mChannelIndex, msg, pos, pos + 100);
+				mResults->AddProtocolFrame(frame);
+			}
+
 			if (!high)
 			{
 				Logging::Write(std::string("Not this time..."));
@@ -108,23 +122,24 @@ void iso7816Analyzer::_WorkerThread()
 					tc) after the rising edge of the signal on RST (at time Tb + tc). If the answer does not begin within 40 000 clock
 					cycles with RST at state H, the interface device shall perform a deactivation.
 				*/
-				pos = decoder->SkipClkCycles(400);
+				pos = decoder->AdvanceClkCycles(400);
 				decoder->Sync(pos);
 
 				// search for first start bit - falling edge
 				LogEvent(pos, std::string("Seeking for start bit..."));
 				fallingIoEdge = decoder->SeekForIoFallingEdge();
+				DumpLines();
 				decoder->Sync(fallingIoEdge);
 				LogEvent(fallingIoEdge, std::string("Falling I/O edge found"));
 
 				// sync lines
 				U64 risingIoEdge = decoder->AdvanceToNextIoEdge();
 				LogEvent(risingIoEdge, std::string("Rising I/O edge found"));
+				DumpLines();
 
 				// We can use the first up/down dip to measure the baud rate.
 				U64 defaultEtu = decoder->CountClkCyclesToPosition(risingIoEdge);
-				decoder->Sync(risingIoEdge);
-
+				LogEvent(fallingIoEdge, std::string("Found the start bit, initial ETU: ") + Convert::ToDec(defaultEtu) + std::string(" clocks..."));
 
 				// default ETU shoud be 372 
 				if (!IsValidETU(defaultEtu))
@@ -133,17 +148,22 @@ void iso7816Analyzer::_WorkerThread()
 					session.reset();
 					continue;
 				}
+
+				// sync lines at the I/O rising edge
+				DumpLines();
+				decoder->Sync(risingIoEdge);
+
+
 				session = Iso7816Session::factory(mResults, defaultEtu, mSettings->mIoChannel.mChannelIndex, mSettings->mResetChannel.mChannelIndex);
 
 				AddMarker(fallingIoEdge, AnalyzerResults::DownArrow, mSettings->mIoChannel);
 				AddMarker(fallingIoEdge + ((risingIoEdge - fallingIoEdge) / 2), AnalyzerResults::Start, mSettings->mIoChannel);
-				AddMarker(risingIoEdge, AnalyzerResults::UpArrow, mSettings->mIoChannel);
-				LogEvent(fallingIoEdge, std::string("Found the start bit, initial ETU: ") + Convert::ToDec(defaultEtu) + std::string(" clocks..."));
+				AddMarker(risingIoEdge, AnalyzerResults::UpArrow, mSettings->mIoChannel);				
 				break;
 			}
 
-			// decode byte
-			unsigned char data = DecodeByte(decoder, session);
+			// decode TS byte
+			unsigned char data = DecodeByte(decoder, session, true);
 
 			U64 endOfByte = decoder->GetIoPosition();
 			decoder->Sync(endOfByte);
@@ -185,6 +205,10 @@ void iso7816Analyzer::_WorkerThread()
 		{
 			LogEvent(ex.getPosition(), std::string("Found RESET line change"));
 		}
+		catch (std::exception& ex2)
+		{
+			LogEvent(0, ex2.what());
+		}
 	}
 }
 
@@ -194,7 +218,7 @@ void iso7816Analyzer::SeekForNextStartBit(Iso7816BitDecoder::ptr decoder, Iso781
 	U64 fallingIoEdge = decoder->SeekForIoFallingEdge();
 	decoder->Sync(fallingIoEdge);
 	AddMarker(fallingIoEdge, AnalyzerResults::DownArrow, mSettings->mIoChannel);
-	U64 endOfStartBit = decoder->SkipClkCycles(session->GetEtu());
+	U64 endOfStartBit = decoder->AdvanceClkCycles(session->GetEtu());
 	AddMarker(fallingIoEdge + ((endOfStartBit - fallingIoEdge) / 2), AnalyzerResults::Start, mSettings->mIoChannel);
 	AddMarker(endOfStartBit, AnalyzerResults::UpArrow, mSettings->mIoChannel);
 	LogEvent(fallingIoEdge, std::string("Found a new start bit"));
@@ -202,10 +226,10 @@ void iso7816Analyzer::SeekForNextStartBit(Iso7816BitDecoder::ptr decoder, Iso781
 }
 
 
-unsigned char iso7816Analyzer::DecodeByte(Iso7816BitDecoder::ptr decoder, Iso7816Session::ptr session)
+unsigned char iso7816Analyzer::DecodeByte(Iso7816BitDecoder::ptr decoder, Iso7816Session::ptr session, bool initialTs)
 {
 	// advance to the middle of first bit
-	U64 pos = decoder->SkipClkCycles(session->GetEtu() / 2);
+	U64 pos = decoder->AdvanceClkCycles(session->GetEtu() / 2);
 	LogEvent(pos, std::string("Mooving to the middle of first bit"));
 	decoder->Sync(pos);
 
@@ -216,7 +240,7 @@ unsigned char iso7816Analyzer::DecodeByte(Iso7816BitDecoder::ptr decoder, Iso781
 		LogEvent(decoder->GetIoPosition(), std::string("Found bit: ") + Convert::ToDec(bit ? 1 : 0));
 
 		// next bit
-		pos = decoder->SkipClkCycles(session->GetEtu());
+		pos = decoder->AdvanceClkCycles(session->GetEtu());
 		decoder->Sync(pos);
 		LogEvent(pos, std::string("Advanced to the next bit"));
 
@@ -229,15 +253,15 @@ unsigned char iso7816Analyzer::DecodeByte(Iso7816BitDecoder::ptr decoder, Iso781
 	LogEvent(pos, std::string("Before parity check..."));
 	LogEvent(pos, std::string("Data: ") + Convert::ToHex(data));
 	LogEvent(pos, std::string("Parity: ") + (p ? std::string("true") : std::string("false")));
-	if (Util::Parity(data) != p) {
-		throw ParityException(mIo->GetSampleNumber());
-	};
+
+	bool expectedParity = initialTs ? initialTs : Util::Parity(data);
+	AddMarker(pos, expectedParity != p ? AnalyzerResults::ErrorX : AnalyzerResults::X, mSettings->mIoChannel);
 
 	// 7.3 Error signal and character repetition
 	/*	As shown in Figure 9, when character parity is incorrect, the receiver shall transmit an error signal on the
 		electrical circuit I/O. Then the receiver shall expect a repetition of the character.
 	*/
-	pos = decoder->SkipClkCycles(session->GetEtu());
+	pos = decoder->AdvanceClkCycles(session->GetEtu());
 	decoder->Sync(pos);
 	if (mIo->GetBitState() != BIT_HIGH)
 	{
@@ -267,6 +291,17 @@ void iso7816Analyzer::AddMarker(U64 position, AnalyzerResults::MarkerType mt, Ch
 {
 	mResults->AddMarker(position, mt, channel);
 	mResults->CommitResults();
+}
+
+void iso7816Analyzer::DumpLines()
+{
+	std::string msg =
+		std::string("I/O: ") + Convert::ToDec(mIo->GetSampleNumber()) + std::string("(") + (mIo->GetBitState() == BIT_HIGH ? "1" : "0") + std::string("), ") +
+		std::string("RST: ") + Convert::ToDec(mReset->GetSampleNumber()) + std::string("(") + (mReset->GetBitState() == BIT_HIGH ? "1" : "0") + std::string("), ") +
+		std::string("CLK: ") + Convert::ToDec(mClk->GetSampleNumber()) + std::string("(") + (mClk->GetBitState() == BIT_HIGH ? "1" : "0") + std::string("), ") +
+		std::string("Vcc: ") + Convert::ToDec(mVcc->GetSampleNumber()) + std::string("(") + (mVcc->GetBitState() == BIT_HIGH ? "1" : "0") + std::string(")");
+    
+	LogEvent(mIo->GetSampleNumber(), msg);
 }
 
 

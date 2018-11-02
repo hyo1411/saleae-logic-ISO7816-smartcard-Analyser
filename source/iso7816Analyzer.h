@@ -55,12 +55,13 @@ public:
 private:
 	virtual void _WorkerThread();
 	void SeekForNextStartBit(Iso7816BitDecoder::ptr decoder, Iso7816Session::ptr session);
-	unsigned char DecodeByte(Iso7816BitDecoder::ptr decoder, Iso7816Session::ptr session);
+	unsigned char DecodeByte(Iso7816BitDecoder::ptr decoder, Iso7816Session::ptr session, bool initialTs = false);
 	bool IsValidETU(U64 ea);
 
 	void LogEvent(U64 position, const std::string& msg);
     void LogEvent(U64 position, const char* msg);
 	void AddMarker(U64 position, AnalyzerResults::MarkerType mt, Channel& channel);
+	void DumpLines();
 
 private: //vars
 	std::unique_ptr<iso7816AnalyzerSettings> mSettings;

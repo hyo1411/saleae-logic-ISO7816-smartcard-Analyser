@@ -10,8 +10,9 @@
 #ifndef DEFINITIONS_HPP
 #define DEFINITIONS_HPP
 
-#define DEF_ETU_MIN 370
-#define DEF_ETU_MAX 375
+// +/- 5%
+#define DEF_ETU_MIN 354
+#define DEF_ETU_MAX 390
 
 #define PPS_HEADER 0xff
 #define PPS0_1 0x10

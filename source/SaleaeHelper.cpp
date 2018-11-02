@@ -32,7 +32,10 @@ U32 SaleaeHelper::AdvanceToAbsPositionOrThrow(AnalyzerChannelData* channel, U64 
 {
 	if (!CanAdvanceToAbsPosition(channel, position))
 	{
-		std::string msg = std::string("Cannot advance channel '") + name + std::string("' to absolute position: ") + Convert::ToDec(position);
+		std::string msg = std::string("Cannot advance channel '") 
+			+ name + std::string("' to absolute position: ") 
+			+ Convert::ToDec(position)
+			+ std::string(", current position is: ") + Convert::ToDec(channel->GetSampleNumber());
 		throw std::runtime_error(msg.c_str());
 	}
 	return channel->AdvanceToAbsPosition(position);

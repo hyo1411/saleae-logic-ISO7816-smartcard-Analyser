@@ -27,7 +27,7 @@ public:
 	void Sync(u64 pos);
 	u64 SeekForResetEdge(bool& high);
 	u64 SeekForIoFallingEdge();
-	u64 SkipClkCycles(std::size_t cycles);
+	u64 AdvanceClkCycles(std::size_t cycles);
 	u64 AdvanceToNextIoEdge();
 	BitState GetIoState();
 	u64 GetIoPosition();

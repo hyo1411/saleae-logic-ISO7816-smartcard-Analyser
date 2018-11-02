@@ -19,6 +19,11 @@ The basic documentation is available from GitHub [doc](doc/) folder
 
 # Releases
 
+**2018.11.02 v0.9.4**
+* DIRECT convention fixed
+* CLK signal handling fixed
+* second release candidate for 1.0
+
 **2017.11.04 v0.9.3**
 * Mac version available
 * first release candidate for 1.0
