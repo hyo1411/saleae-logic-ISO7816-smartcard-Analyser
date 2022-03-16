@@ -35,6 +35,7 @@ iso7816Analyzer::iso7816Analyzer()
 	mSimulationInitilized( false )
 {
 	SetAnalyzerSettings( mSettings.get() );
+	UseFrameV2();
 }
 
 iso7816Analyzer::~iso7816Analyzer()

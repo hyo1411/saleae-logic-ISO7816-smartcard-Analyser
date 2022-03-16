@@ -1,4 +1,4 @@
-// Copyright © 2016 Adam Augustyn <adam@augustyn.net>, all rights reserved.
+// Copyright ï¿½ 2016 Adam Augustyn <adam@augustyn.net>, all rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at:
 //
@@ -8,15 +8,16 @@
 //
 
 #include <string>
+#include <stdexcept>
 
 #ifndef EXCEPTIONS_HPP
 #define EXCEPTIONS_HPP
 
-class DecoderException : public std::exception
+class DecoderException : public std::runtime_error
 {
 public:
 	DecoderException(unsigned long long int pos, const char* msg)
-		: std::exception(msg)
+		: std::runtime_error(msg)
 	{
 		_pos = pos;
 	}

@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Adam Augustyn <adam@augustyn.net>, all rights reserved.
+// Copyright ï¿½ 2017 Adam Augustyn <adam@augustyn.net>, all rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at:
 //
@@ -141,7 +141,7 @@ void Iso7816Session::OnPps()
 	started a PPS exchange(see 9); the default values of the transmission parameters shall continue to
 	apply until completion of a successful PPS exchange(see 9.3), after what the interface device shall
 	start the negotiated transmission protocol using the negotiated values of the transmission parameters.
-	- Otherwise, the interface device shall have started the “first offered transmission protocol” (see TD1 in
+	- Otherwise, the interface device shall have started the ï¿½first offered transmission protocolï¿½ (see TD1 in
 	8.2.3). The interface device shall do so when the card offers only one transmission protocol and only
 	the default values of the transmission parameters. Such a card need not support PPS exchange.
 	*/
@@ -210,13 +210,14 @@ void Iso7816Session::OnTransmission()
 		}
 		_txframe->PushData(_buff.rbegin()->GetValue());
 		{
-			ProtocolFrame::ptr frame = ByteFrame::factory(_chlBytes, _txframe->GetLastElementName(), _buff.back().GetValue(), _buff.back().GetStartPos(), _buff.back().GetEndPos());
-			_results->AddProtocolFrame(frame);
+			//ProtocolFrame::ptr frame = ByteFrame::factory(_chlBytes, _txframe->GetLastElementName(), _buff.back().GetValue(), _buff.back().GetStartPos(), _buff.back().GetEndPos());
+			//_results->AddProtocolFrame(frame);
 		}
 		if (_txframe->Completed())
 		{
-			ProtocolFrame::ptr frame = TextFrame::factory(_chlFrames, _txframe->ToString(), _buff.begin()->GetStartPos(), _buff.rbegin()->GetEndPos());
-			_results->AddProtocolFrame(frame);
+			std::string str = _txframe->ToString();
+			ProtocolFrame::ptr frame = TextFrame::factory(_chlFrames, str, _buff.begin()->GetStartPos(), _buff.rbegin()->GetEndPos());
+			_results->AddProtocolFrame(frame, str.data());
 			_buff.clear();
 			_txframe.reset();
 		}

@@ -8,7 +8,7 @@
 //
 // Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
 //
-
+#define LOGIC2
 #include <iostream>
 #include <fstream>
 #include <algorithm>
@@ -28,10 +28,19 @@ iso7816AnalyzerResults::~iso7816AnalyzerResults()
 {
 }
 
-void iso7816AnalyzerResults::AddProtocolFrame(ProtocolFrame::ptr frame)
+void iso7816AnalyzerResults::AddProtocolFrame(ProtocolFrame::ptr frame, const char* str)
 {
 	_frames.push_back(frame);
 	AddFrame(*(frame.get()));
+	// New FrameV2 code.
+	FrameV2 frame_v2;
+// you can add any number of key value pairs. Each will get it's own column in the data table.
+	frame_v2.AddString( "t1", str );
+// This actually saves your new FrameV2. In this example, we just copy the same start and end sample number from Frame V1 above.
+// The second parameter is the frame "type". Any string is allowed.
+	AddFrameV2( frame_v2, "t1", frame.get()->mStartingSampleInclusive, frame.get()->mEndingSampleInclusive );
+
+
 	CommitResults();
 }
 
